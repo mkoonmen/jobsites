@@ -1,0 +1,1 @@
+2026-11-07 | added 0 | checked: Oyster Bay ZBA PDFs (11-12,11-19,12-10,12-17), Southold/Southampton/Brookhaven/East Hampton AgendaCenters, web search | failed: all fetches blocked (hosts not resolvable in session network allowlist: oysterbaytown.com, southoldtownny.gov, southamptontownny.gov, brookhavenny.gov, ehamptonny.gov); other sources not attempted
