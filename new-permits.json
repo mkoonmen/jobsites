@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-05",
+ "updated": "2026-11-10",
  "sites": [
   {
    "lat": 0,
@@ -378,6 +378,62 @@
    "approx": false,
    "navq": "",
    "firstSeen": "2026-11-05"
+  },
+  {
+   "lat": 0,
+   "lon": 0,
+   "addr": "660 King Street, Orient, NY 11957",
+   "town": "Orient",
+   "type": "Additions and alterations to single-family dwelling (Southold ZBA)",
+   "builder": "",
+   "owner": "",
+   "date": "2026-11-05",
+   "isNew": false,
+   "approx": false,
+   "navq": "",
+   "firstSeen": "2026-11-10"
+  },
+  {
+   "lat": 0,
+   "lon": 0,
+   "addr": "7750 Bridge Lane, Cutchogue, NY 11935",
+   "town": "Cutchogue",
+   "type": "Colusa subdivision: 47 residential lots, set for hearing (Southold Planning Board)",
+   "builder": "",
+   "owner": "",
+   "date": "2026-11-02",
+   "isNew": true,
+   "approx": false,
+   "navq": "",
+   "firstSeen": "2026-11-10"
+  },
+  {
+   "lat": 0,
+   "lon": 0,
+   "addr": "7395 Route 25, East Marion, NY 11939",
+   "town": "East Marion",
+   "type": "Four-lot residential subdivision (Southold Planning Board)",
+   "builder": "",
+   "owner": "",
+   "date": "2026-11-02",
+   "isNew": true,
+   "approx": false,
+   "navq": "",
+   "firstSeen": "2026-11-10"
+  },
+  {
+   "lat": 0,
+   "lon": 0,
+   "addr": "2355 Main Bayview Road, Southold, NY 11971",
+   "town": "Southold",
+   "type": "Five-lot residential subdivision (Southold Planning Board)",
+   "builder": "",
+   "owner": "",
+   "date": "2026-11-02",
+   "isNew": true,
+   "approx": false,
+   "navq": "",
+   "firstSeen": "2026-11-10"
   }
  ]
 }
