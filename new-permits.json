@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-15",
+  "updated": "2026-11-17",
   "sites": [
     {
       "lat": 0,
@@ -574,6 +574,76 @@
       "approx": false,
       "navq": "",
       "firstSeen": "2026-11-15"
+    },
+    {
+      "lat": 0,
+      "lon": 0,
+      "addr": "105 Cleveland Place, Massapequa, NY 11758",
+      "town": "Massapequa",
+      "type": "Two story / second story addition (Oyster Bay ZBA)",
+      "builder": "",
+      "owner": "",
+      "date": "2026-12-17",
+      "isNew": false,
+      "approx": false,
+      "navq": "",
+      "firstSeen": "2026-11-17"
+    },
+    {
+      "lat": 0,
+      "lon": 0,
+      "addr": "70 Oakwood Avenue, Farmingdale, NY 11735",
+      "town": "Farmingdale",
+      "type": "Dormer addition with egress windows (Oyster Bay ZBA)",
+      "builder": "",
+      "owner": "",
+      "date": "2026-12-17",
+      "isNew": false,
+      "approx": false,
+      "navq": "",
+      "firstSeen": "2026-11-17"
+    },
+    {
+      "lat": 0,
+      "lon": 0,
+      "addr": "11 Walnut Avenue, East Norwich, NY 11732",
+      "town": "East Norwich",
+      "type": "Two story addition (Oyster Bay ZBA)",
+      "builder": "",
+      "owner": "",
+      "date": "2026-12-17",
+      "isNew": false,
+      "approx": false,
+      "navq": "",
+      "firstSeen": "2026-11-17"
+    },
+    {
+      "lat": 0,
+      "lon": 0,
+      "addr": "69 Park Avenue, Oyster Bay, NY 11771",
+      "town": "Oyster Bay",
+      "type": "Second floor addition (Oyster Bay ZBA)",
+      "builder": "",
+      "owner": "",
+      "date": "2026-12-17",
+      "isNew": false,
+      "approx": false,
+      "navq": "",
+      "firstSeen": "2026-11-17"
+    },
+    {
+      "lat": 0,
+      "lon": 0,
+      "addr": "173 Wetherill Road, Garden City, NY 11530",
+      "town": "Garden City",
+      "type": "Full second floor addition + first floor addition and portico (Garden City ARB)",
+      "builder": "Evergreen 68 LLC",
+      "owner": "",
+      "date": "2026-11-24",
+      "isNew": false,
+      "approx": false,
+      "navq": "",
+      "firstSeen": "2026-11-17"
     }
   ]
 }
