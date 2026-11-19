@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Field Hub</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --bg:#f4f5f7; --panel:#fff; --ink:#14181f; --mute:#5c6675; --line:#dfe3e9; --soft:#eef1f5;
+  --accent:#0b6bcb; --accent-ink:#fff; --good:#1c8a4a; --warn:#b26a00; --bad:#b3261e; --wait:#7a4bc4; --dead:#7b8494;
+  --r:10px; --shadow:0 1px 2px rgba(15,23,42,.06),0 4px 14px rgba(15,23,42,.05);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0e1116; --panel:#171b22; --ink:#e8ecf2; --mute:#98a2b3; --line:#2a303a; --soft:#1e232c;
+  --accent:#58a6ff; --accent-ink:#06121f; --good:#4cc47a; --warn:#e3a73f; --bad:#ff7b72; --wait:#b79cf0; --dead:#8a93a3;
+  --shadow:none;
+}}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent)}
+h1,h2,h3{margin:0;line-height:1.25}
+.hide{display:none!important}
+
+header{position:sticky;top:0;z-index:1000;background:var(--panel);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:8px 16px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:17px;letter-spacing:-.01em;white-space:nowrap}
+nav{display:flex;gap:2px;background:var(--soft);padding:3px;border-radius:9px}
+nav button{border:0;background:none;padding:6px 13px;border-radius:7px;cursor:pointer;color:var(--mute);font-weight:600;white-space:nowrap}
+nav button[aria-selected=true]{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+.sync{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--dead);flex:none}
+.dot.live{background:var(--good)} .dot.wait{background:var(--wait)} .dot.err{background:var(--bad)}
+.banner{background:color-mix(in srgb,var(--warn) 14%,var(--panel));border-bottom:1px solid var(--line);padding:9px 16px;font-size:14px}
+
+main{max-width:1280px;margin:0 auto;padding:14px 16px 60px}
+.split{display:grid;grid-template-columns:minmax(300px,400px) 1fr;gap:14px;align-items:start}
+@media (max-width:860px){.split{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.pad{padding:14px 16px}
+.tools{display:flex;flex-direction:column;gap:8px;padding:12px}
+input[type=text],input[type=search],input[type=tel],input[type=email],input[type=password],select,textarea{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+textarea{min-height:84px;resize:vertical}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 11px;font-size:13px;cursor:pointer;color:var(--mute)}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.count{font-size:12.5px;color:var(--mute);padding:0 12px 8px}
+.list{max-height:calc(100vh - 250px);overflow:auto;border-top:1px solid var(--line)}
+@media (max-width:860px){.list{max-height:46vh}}
+.row{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:9px 12px;cursor:pointer}
+.row:hover{background:var(--soft)} .row[aria-current=true]{background:color-mix(in srgb,var(--accent) 12%,var(--panel))}
+.row b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row>span{display:block;font-size:13px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;border-radius:5px;padding:1px 6px;background:var(--soft);color:var(--mute);margin-right:5px;vertical-align:1px}
+.tag.good{background:color-mix(in srgb,var(--good) 16%,var(--panel));color:var(--good)}
+.tag.warn{background:color-mix(in srgb,var(--warn) 18%,var(--panel));color:var(--warn)}
+.tag.bad{background:color-mix(in srgb,var(--bad) 15%,var(--panel));color:var(--bad)}
+.tag.wait{background:color-mix(in srgb,var(--wait) 16%,var(--panel));color:var(--wait)}
+.tag.blue{background:color-mix(in srgb,var(--accent) 15%,var(--panel));color:var(--accent)}
+.empty{padding:36px 16px;text-align:center;color:var(--mute)}
+
+.detail h2{font-size:20px;letter-spacing:-.01em}
+.sub{color:var(--mute);font-size:13.5px;margin-top:2px}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:5px 12px;margin:12px 0;font-size:14.5px}
+.kv dt{color:var(--mute)} .kv dd{margin:0;overflow-wrap:anywhere}
+.sec{border-top:1px solid var(--line);padding:13px 16px}
+.sec h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}.kv{grid-template-columns:96px 1fr}}
+label{display:block;font-size:13px;color:var(--mute);margin-bottom:3px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 13px;cursor:pointer;font-weight:600;text-decoration:none;color:var(--ink);display:inline-block}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.small{padding:4px 10px;font-size:13px}
+.alert{border-radius:8px;padding:9px 12px;margin:10px 0;font-size:14px;border:1px solid var(--line);background:var(--soft)}
+.alert.bad{border-color:color-mix(in srgb,var(--bad) 40%,var(--line));background:color-mix(in srgb,var(--bad) 9%,var(--panel))}
+.alert.warn{border-color:color-mix(in srgb,var(--warn) 40%,var(--line));background:color-mix(in srgb,var(--warn) 10%,var(--panel))}
+.hist{list-style:none;margin:0;padding:0;font-size:14px}
+.hist li{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.hist li:last-child{border:0} .hist time{color:var(--mute);font-variant-numeric:tabular-nums}
+.pre{white-space:pre-wrap;overflow-wrap:anywhere}
+#map{height:340px;border-radius:var(--r) var(--r) 0 0;z-index:1;background:var(--soft)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;padding:7px 12px;font-size:12.5px;color:var(--mute);border-top:1px solid var(--line)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.match{font-size:13.5px;margin-top:6px}
+.match button{display:block;border:0;background:none;color:var(--accent);padding:2px 0;cursor:pointer;text-align:left}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th:first-child,td:first-child{padding-left:16px}
+th{color:var(--mute);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.tablewrap{overflow-x:auto}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:9px 16px;border-radius:999px;font-size:14px;z-index:3000;box-shadow:0 6px 22px rgba(0,0,0,.25);max-width:92vw}
+#connect{max-width:620px;margin:6vh auto;padding:0 16px}
+#connect ol{padding-left:20px} #connect li{margin:7px 0}
+code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:13px}
+</style>
+</head>
+<body>
+
+<div id="connect" class="hide">
+  <div class="card pad">
+    <h1 style="font-size:24px">Field Hub</h1>
+    <p class="sub" style="font-size:15px">The website side of your Field Hub app. Leads, job sites and notes you add here show up on your iPhone within a few seconds, and what you log on the phone shows up here.</p>
+    <p>This page holds no data of its own. Your data stays in your private GitHub repository <code>mkoonmen/fieldhub-data</code>, so this browser needs a key to open it. You do this once per browser.</p>
+    <ol>
+      <li>Open <a id="tokenLink" target="_blank" rel="noopener" href="https://github.com/settings/personal-access-tokens/new?name=Field+Hub+website&description=Lets+the+Field+Hub+website+read+and+update+fieldhub-data&expires_in=366&contents=write">GitHub: new fine-grained token</a> (sign in if asked).</li>
+      <li>Under <b>Repository access</b> pick <b>Only select repositories</b> and choose <b>fieldhub-data</b>.</li>
+      <li>Under <b>Permissions &rarr; Repository permissions</b>, set <b>Contents</b> to <b>Read and write</b>. Leave everything else alone.</li>
+      <li>Press <b>Generate token</b>, copy it, and paste it below.</li>
+    </ol>
+    <form id="connectForm">
+      <label for="tokenInput">Token (starts with github_pat_)</label>
+      <input id="tokenInput" type="password" autocomplete="off" spellcheck="false" required>
+      <div class="btns"><button class="btn primary" type="submit">Connect this browser</button></div>
+      <p id="connectMsg" class="sub"></p>
+    </form>
+    <p class="sub">The token is saved only in this browser and is sent only to GitHub. It can open that one repository and nothing else. You can remove it any time from the Activity tab here, or delete it on GitHub.</p>
+  </div>
+</div>
+
+<div id="app" class="hide">
+  <header>
+    <div class="brand">Field Hub</div>
+    <nav role="tablist" aria-label="Sections">
+      <button role="tab" data-tab="leads" aria-selected="true">Leads</button>
+      <button role="tab" data-tab="sites" aria-selected="false">Job sites</button>
+      <button role="tab" data-tab="add" aria-selected="false">Add</button>
+      <button role="tab" data-tab="activity" aria-selected="false">Activity</button>
+    </nav>
+    <div class="sync" title="How fresh the phone's data is"><span id="dot" class="dot"></span><span id="syncText">Loading…</span></div>
+  </header>
+  <div id="banner" class="banner hide"></div>
+
+  <main>
+    <!-- LEADS -->
+    <section id="tab-leads">
+      <div class="split">
+        <div class="card">
+          <div class="tools">
+            <input id="leadQ" type="search" placeholder="Search company, person, town, phone or email" aria-label="Search leads" autocomplete="off">
+            <div class="chips" id="leadChips"></div>
+          </div>
+          <div class="count" id="leadCount"></div>
+          <div class="list" id="leadList"></div>
+        </div>
+        <div class="card detail" id="leadDetail"><div class="empty">Search for a company to see whether it is already in your list, or pick one on the left.</div></div>
+      </div>
+    </section>
+
+    <!-- SITES -->
+    <section id="tab-sites" class="hide">
+      <div class="split">
+        <div class="card">
+          <div class="tools">
+            <input id="siteQ" type="search" placeholder="Search address, town or builder" aria-label="Search job sites" autocomplete="off">
+            <div class="chips" id="siteChips"></div>
+          </div>
+          <div class="count" id="siteCount"></div>
+          <div class="list" id="siteList"></div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div id="map"></div>
+            <div class="legend">
+              <span><i style="background:#0b6bcb"></i>To visit</span>
+              <span><i style="background:#e0559b"></i>New this week</span>
+              <span><i style="background:#1c8a4a"></i>Visited, still live</span>
+              <span><i style="background:#d08a00"></i>No signs yet</span>
+              <span><i style="background:#7b8494"></i>Done / not a fit</span>
+              <span><i style="background:#7a4bc4"></i>Waiting for phone</span>
+            </div>
+          </div>
+          <div class="card detail" id="siteDetail"><div class="empty">Pick a job site from the list or the map.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADD -->
+    <section id="tab-add" class="hide">
+      <div class="grid2" style="align-items:start">
+        <form class="card" id="addLead" autocomplete="off">
+          <div class="pad"><h2 style="font-size:18px">Add a lead</h2><div class="sub">Goes straight into Leads on your phone.</div></div>
+          <div class="sec">
+            <label for="al_company">Company *</label><input id="al_company" name="company" type="text" required>
+            <div class="match" id="al_match"></div>
+            <div class="grid2" style="margin-top:10px">
+              <div><label for="al_contact">Contact person</label><input id="al_contact" name="contact" type="text"></div>
+              <div><label for="al_town">Town</label><input id="al_town" name="town" type="text"></div>
+              <div><label for="al_phone">Phone</label><input id="al_phone" name="phone" type="tel"></div>
+              <div><label for="al_email">Email</label><input id="al_email" name="email" type="email"></div>
+            </div>
+            <div style="margin-top:10px"><label for="al_source">Where you found them (link)</label><input id="al_source" name="source" type="text" placeholder="https://"></div>
+            <div style="margin-top:10px"><label for="al_note">Note</label><textarea id="al_note" name="note"></textarea></div>
+            <div class="btns"><button class="btn primary" type="submit">Add lead</button></div>
+          </div>
+        </form>
+
+        <form class="card" id="addSite" autocomplete="off">
+          <div class="pad"><h2 style="font-size:18px">Add a job site</h2><div class="sub">Drops a pin on your phone's map. The phone looks up the location.</div></div>
+          <div class="sec">
+            <label for="as_addr">Street address *</label><input id="as_addr" name="addr" type="text" required placeholder="123 Main St, Quogue, NY 11959">
+            <div class="match" id="as_match"></div>
+            <div class="grid2" style="margin-top:10px">
+              <div><label for="as_town">Town or hamlet</label><input id="as_town" name="town" type="text"></div>
+              <div><label for="as_kind">Kind of job</label><select id="as_kind" name="kind"><option>Addition / renovation</option><option>New home</option><option>Demolish and rebuild</option><option>Other</option></select></div>
+            </div>
+            <div style="margin-top:10px"><label for="as_builder">Builder, if known</label><input id="as_builder" name="builder" type="text"></div>
+            <div style="margin-top:10px"><label for="as_note">Research note</label><textarea id="as_note" name="note"></textarea></div>
+            <div class="btns"><button class="btn primary" type="submit">Add job site</button></div>
+          </div>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="pad"><h2 style="font-size:18px">Paste several leads at once</h2>
+          <div class="sub">One lead per line, parts separated by a tab or a <code>|</code>: Company | Contact | Phone | Email | Town | Note. Pasting rows straight from a spreadsheet works.</div></div>
+        <div class="sec">
+          <textarea id="bulkText" style="min-height:120px" placeholder="Hampton Custom Builders | Dan Reyes | 631-555-0142 | dan@example.com | Sag Harbor | Found on Houzz, builds 3-4 homes a year" aria-label="Leads to paste"></textarea>
+          <div class="btns"><button class="btn" id="bulkCheck" type="button">Check the list</button><button class="btn primary hide" id="bulkAdd" type="button">Add</button></div>
+          <div class="tablewrap" id="bulkPreview" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTIVITY -->
+    <section id="tab-activity" class="hide">
+      <div class="card">
+        <div class="pad"><h2 style="font-size:18px">What you've sent from this browser</h2><div class="sub" id="actSub"></div></div>
+        <div class="tablewrap" id="actList"></div>
+      </div>
+      <div class="card pad" style="margin-top:14px">
+        <h2 style="font-size:16px">This browser</h2>
+        <p class="sub" id="phoneInfo"></p>
+        <div class="btns"><button class="btn" id="refreshNow" type="button">Refresh now</button><button class="btn" id="disconnect" type="button">Disconnect this browser</button></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="toast" class="toast hide" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+'use strict';
+const REPO = 'mkoonmen/fieldhub-data';
+const API = 'https://api.github.com/repos/' + REPO;
+const PUB = 'https://raw.githubusercontent.com/mkoonmen/jobsites/main/';
+const POLL_MS = 10000;
+const NOSIGNS = 'No Signs of Construction';
+const STAGES = ['', NOSIGNS, 'Cleared lot', 'Foundation', 'Framing', 'Dried in', 'Windows in', 'Siding / finish', 'Finished'];
+const OUTCOMES = ['', 'Talked to GC', 'Left card', 'No one there', "Couldn't access", 'Bust', 'Competitor locked in', 'Follow up', 'Not a fit'];
+const WINDOWS = ['Not in yet', 'Pella', 'Andersen', 'Marvin', 'Kolbe', 'Loewen', 'Windsor', 'Other'];
+const STATUS = {'': 'No status', interested: 'Interested', quote: 'Quote out', nurture: 'Nurture', not_interested: 'Not interested', dnc: 'Do not contact'};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} }
+};
+const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const enc = s => { const b = new TextEncoder().encode(s); let o = ''; for (let i = 0; i < b.length; i += 0x8000) o += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(o); };
+const dec = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g, '')), c => c.charCodeAt(0)));
+const newId = () => 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hide'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.add('hide'), 3200); }
+
+let token = store.get('fh.token', '');
+const S = {
+  baseSites: [], baseLeads: [], fresh: [], older: [], backup: {}, haveBackup: false, etag: null,
+  inbox: {ops: []}, queue: store.get('fh.queue', []), sent: store.get('fh.sent', []),
+  sites: [], siteById: new Map(), leads: [], leadByK: new Map(), log: {}, visits: {}, notes: {},
+  leadSel: null, siteSel: null, leadFilter: 'all', siteFilter: 'todo', err: '', lastOk: 0
+};
+
+/* ---------- GitHub ---------- */
+function gh(path, {method = 'GET', body, raw = false, etag} = {}) {
+  const h = {Authorization: 'Bearer ' + token, Accept: raw ? 'application/vnd.github.raw+json' : 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'};
+  if (etag) h['If-None-Match'] = etag;
+  return fetch(API + path, {method, headers: h, body: body ? JSON.stringify(body) : undefined, cache: 'no-store'});
+}
+async function getJSON(path, fallback) {
+  const r = await gh('/contents/' + path, {raw: true});
+  if (r.status === 404) return fallback;
+  if (!r.ok) throw new Error('GitHub answered ' + r.status + ' for ' + path);
+  return r.json();
+}
+
+/* ---------- Same ids the phone uses ---------- */
+const siteKey = a => a.toLowerCase().split(',').slice(0, 2).join(',').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const CANON = {lane: 'ln', street: 'st', road: 'rd', avenue: 'ave', av: 'ave', drive: 'dr', court: 'ct', place: 'pl', boulevard: 'blvd', highway: 'hwy', turnpike: 'tpke', terrace: 'ter', circle: 'cir', parkway: 'pkwy', path: 'pth', north: 'n', south: 's', east: 'e', west: 'w', point: 'pt', saint: 'st', mount: 'mt'};
+const canon = a => a.toLowerCase().split(',').slice(0, 2).join(' ').replace(/[^a-z0-9 ]+/g, ' ').split(' ').filter(Boolean).map(w => CANON[w] || w).join(' ');
+const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+const coName = s => norm(s).replace(/\b(inc|llc|corp|co|company|ltd|the|and|construction|contracting|builders?|building|homes?|custom|group|associates|enterprises|services)\b/g, ' ').replace(/\s+/g, ' ').trim();
+const visitDate = v => v && typeof v.date === 'number' ? new Date((v.date + 978307200) * 1000) : null;
+const isDead = v => ['Competitor locked in', 'Not a fit', 'Bust'].includes(v.outcome) || v.stage === 'Finished' || (!['', 'Not in yet', 'Pella'].includes(v.windows) && ['Windows in', 'Siding / finish'].includes(v.stage));
+const daysAgo = ymd => { const t = Date.parse(ymd + 'T12:00:00'); return isNaN(t) ? 9999 : Math.floor((Date.now() - t) / 864e5); };
+
+/* ---------- Build what's on screen from the phone's data plus anything still on its way ---------- */
+function pendingOps() {
+  const applied = new Set(S.backup.applied_ops || []);
+  const seen = new Set(), out = [];
+  for (const o of [...(S.inbox.ops || []), ...S.queue]) { if (applied.has(o.id) || seen.has(o.id)) continue; seen.add(o.id); out.push(o); }
+  return out.sort((a, b) => a.t - b.t);
+}
+function derive() {
+  const b = S.backup, geo = b.geocache || {}, pend = pendingOps();
+  // Sites
+  const mine = (b.custom_sites || []).map(s => ({...s, mine: true}));
+  for (const o of pend) if (o.type === 'site.add') mine.push({lat: o.lat || 0, lon: o.lon || 0, addr: o.addr, town: o.town || '', type: (o.kind || 'Addition / renovation') + ' (added on the website)', builder: o.builder || '', owner: '', date: today(), isNew: false, approx: false, mine: true, pending: true});
+  const seen = new Map(), all = [];
+  for (const s of [...mine, ...S.baseSites, ...S.fresh, ...S.older]) {
+    if (!s || !s.addr) continue;
+    const k = canon(s.addr);
+    if (seen.has(k)) { const a = all[seen.get(k)]; if (!a.builder && s.builder) a.builder = s.builder; if (!a.owner && s.owner) a.owner = s.owner; if (!a.firstSeen && s.firstSeen) a.firstSeen = s.firstSeen; if (a.pending && !s.pending) a.pending = false; continue; }
+    seen.set(k, all.length);
+    const t = {...s, id: siteKey(s.addr)};
+    if (!(t.lat && t.lon)) { const g = geo[s.addr.toLowerCase()]; if (g && g.length === 2) { t.lat = g[0]; t.lon = g[1]; } else { t.lat = 0; t.lon = 0; } }
+    all.push(t);
+  }
+  const fixes = b.address_fixes || {}, pins = b.pins || {};
+  for (const s of all) {
+    if (fixes[s.id]) s.addr = fixes[s.id];
+    const p = pins[s.id]; if (p && p.length === 2) { s.lat = p[0]; s.lon = p[1]; }
+  }
+  S.visits = {...(b.visits || {})};
+  S.notes = {...(b.site_notes || {})};
+  for (const o of pend) {
+    if (o.type === 'site.note') { if (o.text) S.notes[o.site_id] = o.text; else delete S.notes[o.site_id]; }
+    if (o.type === 'site.add' && o.note) S.notes[siteKey(o.addr)] = o.note;
+    if (o.type === 'visit.update') { const v = S.visits[o.site_id] || {date: o.t / 1000 - 978307200, gc: '', sign: false, contact: '', windows: 'Not in yet', stage: '', outcome: '', notes: ''}; S.visits[o.site_id] = {...v, ...o.fields, waiting: true}; }
+  }
+  S.sites = all; S.siteById = new Map(all.map(s => [s.id, s]));
+
+  // Leads
+  const custom = (b.custom_leads || []).map(l => ({...l, mine: true}));
+  const have = new Set(custom.map(l => l.k));
+  for (const o of pend) if (o.type === 'lead.add' && !have.has(o.k)) custom.push({k: o.k, c: o.company, t: o.town || '', a: 'Added by you', p: o.phone || '', e: o.email || '', ct: o.contact || '', v: 'Reach out now', b: 'Added on the website', val: '', s: '', n: [o.note, o.source].filter(Boolean).join('\n'), mine: true, pending: true});
+  S.leads = [...custom, ...S.baseLeads];
+  S.leadByK = new Map(S.leads.map(l => [l.k, l]));
+  const log = JSON.parse(JSON.stringify(b.leadlog || {}));
+  for (const o of pend) {
+    if (!o.k || !o.type.startsWith('lead.') || o.type === 'lead.add') continue;
+    const g = log[o.k] || (log[o.k] = {touches: [], status: '', note: ''});
+    if (o.type === 'lead.note') g.note = o.text || '';
+    if (o.type === 'lead.status') g.status = o.status || '';
+    if (o.type === 'lead.touch') (g.touches = g.touches || []).push({d: today(), ch: o.ch, waiting: true});
+    g.waiting = true;
+  }
+  S.log = log;
+  for (const l of S.leads) if (!l._h) l._h = [l.c, l.ct, l.t, l.e, l.n, l.b].join(' ').toLowerCase() + ' ' + String(l.p || '').replace(/\D/g, '');
+}
+
+/* ---------- Sending changes to the phone ---------- */
+let flushing = false;
+function send(op, label) {
+  op.id = newId(); op.t = Date.now();
+  S.queue.push(op); store.set('fh.queue', S.queue);
+  S.sent.unshift({id: op.id, t: op.t, label}); S.sent = S.sent.slice(0, 250); store.set('fh.sent', S.sent);
+  derive(); renderAll(); flush();
+}
+async function flush() {
+  if (flushing || !S.queue.length) return;
+  flushing = true; renderSync();
+  try {
+    for (let tries = 0; tries < 6 && S.queue.length; tries++) {
+      const r = await gh('/contents/inbox.json');
+      let sha, box = {ops: []};
+      if (r.status === 200) { const j = await r.json(); sha = j.sha; try { box = JSON.parse(dec(j.content)) || {ops: []}; } catch { box = {ops: []}; } }
+      else if (r.status !== 404) throw new Error('GitHub answered ' + r.status);
+      const applied = new Set(S.backup.applied_ops || []), now = Date.now();
+      box.ops = (box.ops || []).filter(o => !(applied.has(o.id) && now - o.t > 2 * 864e5) && now - o.t < 45 * 864e5);
+      const batch = S.queue.slice();
+      for (const o of batch) if (!box.ops.some(x => x.id === o.id)) box.ops.push(o);
+      const put = await gh('/contents/inbox.json', {method: 'PUT', body: {message: 'Website: ' + batch.length + (batch.length === 1 ? ' change' : ' changes'), content: enc(JSON.stringify(box, null, 1)), ...(sha ? {sha} : {})}});
+      if (put.ok) { const ids = new Set(batch.map(o => o.id)); S.queue = S.queue.filter(o => !ids.has(o.id)); store.set('fh.queue', S.queue); S.inbox = box; S.err = ''; break; }
+      if (put.status === 403 || put.status === 404) throw new Error('This token can read but not write. On GitHub, set Contents to "Read and write" for fieldhub-data.');
+      if (put.status !== 409 && put.status !== 422) throw new Error('GitHub answered ' + put.status);
+      await sleep(500 * (tries + 1));
+    }
+  } catch (e) { S.err = navigator.onLine === false ? 'Offline. Changes are saved here and will send when you are back online.' : String(e.message || e); }
+  flushing = false;
+  if (S.queue.length) setTimeout(flush, 5000);
+  derive(); renderAll();
+}
+
+/* ---------- Loading and live refresh ---------- */
+async function pollBackup(force) {
+  try {
+    const r = await gh('/contents/backup.json', {raw: true, etag: force ? null : S.etag});
+    if (r.status === 304) { S.lastOk = Date.now(); if (S.err && !S.queue.length) S.err = ''; renderSync(); return false; }
+    if (r.status === 401) { S.err = 'GitHub no longer accepts this token. Disconnect on the Activity tab and connect again.'; renderSync(); return false; }
+    if (!r.ok) throw new Error('GitHub answered ' + r.status);
+    S.etag = r.headers.get('ETag'); S.backup = await r.json(); S.haveBackup = true; S.lastOk = Date.now(); if (!S.queue.length) S.err = '';
+    derive(); renderAll(); return true;
+  } catch (e) { S.err = navigator.onLine === false ? 'Offline.' : 'Could not reach GitHub. Trying again.'; renderSync(); return false; }
+}
+async function loadAll() {
+  $('#syncText').textContent = 'Loading your data…';
+  const pub = f => fetch(PUB + f, {cache: 'no-store'}).then(r => r.ok ? r.json() : {sites: []}).catch(() => ({sites: []}));
+  const [sites, leads, fresh, older, inbox] = await Promise.all([
+    getJSON('web/sites.json', []), getJSON('web/leads.json', {leads: []}), pub('new-permits.json'), pub('all-permits.json'), getJSON('inbox.json', {ops: []})
+  ]);
+  S.baseSites = sites; S.baseLeads = leads.leads || []; S.fresh = fresh.sites || []; S.older = older.sites || []; S.inbox = inbox && inbox.ops ? inbox : {ops: []};
+  S.feedUpdated = fresh.updated || '';
+  await pollBackup(true);
+  derive(); renderAll(); applyHash(); flush();
+  setInterval(() => { if (!document.hidden) pollBackup(); }, POLL_MS);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { pollBackup(); flush(); } });
+  window.addEventListener('online', () => { pollBackup(); flush(); });
+}
+
+/* ---------- Header ---------- */
+function ago(d) { const s = Math.max(0, (Date.now() - d) / 1000); if (s < 45) return 'just now'; if (s < 3600) return Math.round(s / 60) + ' min ago'; if (s < 86400) return Math.round(s / 3600) + ' hr ago'; return Math.round(s / 86400) + ' days ago'; }
+function renderSync() {
+  const waiting = pendingOps().length, dot = $('#dot'), saved = S.backup.saved_at ? Date.parse(S.backup.saved_at) : 0;
+  let text;
+  if (S.err) { dot.className = 'dot err'; text = S.err; }
+  else if (flushing) { dot.className = 'dot wait'; text = 'Sending…'; }
+  else if (waiting) { dot.className = 'dot wait'; text = waiting + (waiting === 1 ? ' change' : ' changes') + ' waiting for your phone'; }
+  else { dot.className = 'dot live'; text = saved ? 'Up to date · phone last checked in ' + ago(saved) : 'Connected'; }
+  $('#syncText').textContent = text;
+  const ban = $('#banner'), old = S.haveBackup && !('applied_ops' in S.backup);
+  ban.classList.toggle('hide', !old);
+  if (old) ban.textContent = 'Your phone is on an older version of the app. Update Field Hub in TestFlight (build 49 or later) and open it once; until then, what you add here waits in line and what you log on the phone shows up here only after its regular sync.';
+}
+
+/* ---------- Leads ---------- */
+const LEAD_FILTERS = [['all', 'All'], ['now', 'Reach out now'], ['progress', 'In progress'], ['touched', 'You logged'], ['mine', 'You added'], ['removed', 'Off-limits']];
+function leadBadge(l) {
+  const g = S.log[l.k] || {};
+  if (l.pending) return '<span class="tag wait">Waiting for phone</span>';
+  if (l.s === 'removed') return '<span class="tag bad">Off-limits</span>';
+  if (g.status) return '<span class="tag ' + (g.status === 'dnc' || g.status === 'not_interested' ? 'bad' : 'good') + '">' + esc(STATUS[g.status] || g.status) + '</span>';
+  if (l.mine) return '<span class="tag blue">You added</span>';
+  if (l.v) return '<span class="tag' + (l.v === 'Reach out now' ? ' blue' : '') + '">' + esc(l.v) + '</span>';
+  return '';
+}
+function leadMatches() {
+  const q = $('#leadQ').value.trim().toLowerCase(), words = q.split(/\s+/).filter(Boolean), digits = q.replace(/\D/g, '');
+  const f = S.leadFilter;
+  return S.leads.filter(l => {
+    const g = S.log[l.k];
+    if (f === 'now' && !(l.v === 'Reach out now' && l.s !== 'removed')) return false;
+    if (f === 'progress' && !(l.v === 'In progress' || l.s === 'working')) return false;
+    if (f === 'touched' && !(g && ((g.touches || []).length || g.status || g.note))) return false;
+    if (f === 'mine' && !l.mine) return false;
+    if (f === 'removed' && l.s !== 'removed') return false;
+    if (!words.length) return true;
+    if (digits.length >= 7 && l._h.includes(digits)) return true;
+    return words.every(w => l._h.includes(w));
+  });
+}
+function renderLeads() {
+  $('#leadChips').innerHTML = LEAD_FILTERS.map(([k, n]) => '<button type="button" class="chip" data-f="' + k + '" aria-pressed="' + (S.leadFilter === k) + '">' + n + '</button>').join('');
+  const m = leadMatches(), show = m.slice(0, 120);
+  $('#leadCount').textContent = m.length === S.leads.length ? S.leads.length.toLocaleString() + ' leads' : m.length.toLocaleString() + ' of ' + S.leads.length.toLocaleString() + (m.length > show.length ? ' · showing the first ' + show.length : '');
+  $('#leadList').innerHTML = show.length ? show.map(l =>
+    '<button type="button" class="row" data-k="' + esc(l.k) + '" aria-current="' + (S.leadSel === l.k) + '"><b>' + esc(l.c) + '</b><span>' + leadBadge(l) + esc([l.ct, (l.t || '').split(' / ')[0]].filter(Boolean).join(' · ')) + '</span></button>').join('')
+    : '<div class="empty">No lead matches that.<br><button type="button" class="btn small" id="addFromSearch" style="margin-top:10px">Add “' + esc($('#leadQ').value.trim()) + '” as a new lead</button></div>';
+  renderLeadDetail();
+}
+function renderLeadDetail() {
+  const el = $('#leadDetail'), l = S.leadByK.get(S.leadSel);
+  if (!l) { if (S.leadSel) el.innerHTML = '<div class="empty">That lead is no longer in the list.</div>'; return; }
+  if (el.dataset.k === l.k && el.contains(document.activeElement) && ['TEXTAREA', 'INPUT', 'SELECT'].includes(document.activeElement.tagName)) return; // don't yank the form while typing
+  const g = S.log[l.k] || {touches: [], status: '', note: ''};
+  const phones = String(l.p || '').match(/\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g) || [];
+  const emails = String(l.e || '').match(/[^\s,;]+@[^\s,;]+\.[A-Za-z]{2,}/g) || [];
+  const hist = [];
+  for (const t of g.touches || []) hist.push({d: t.d, who: 'You', text: t.ch + (t.waiting ? ' (waiting for phone)' : '')});
+  for (const r of g.results || []) hist.push({d: r.d, who: 'You', text: r.ch});
+  for (const t of l.tl || []) hist.push({d: t[0], who: t[1] === 'in' ? 'Them' : t[1] === 'out' ? 'You' : t[1], text: [t[2], t[3]].filter(Boolean).join(': ')});
+  hist.sort((a, b) => String(b.d).localeCompare(String(a.d)));
+  const search = encodeURIComponent(l.c + ' ' + (l.t || '').split(' / ')[0] + ' NY');
+  el.dataset.k = l.k;
+  el.innerHTML =
+    '<div class="pad"><h2>' + esc(l.c) + '</h2><div class="sub">' + leadBadge(l) + esc([l.a, l.b].filter(Boolean).join(' · ')) + '</div>' +
+    (l.s === 'removed' ? '<div class="alert bad"><b>Off-limits.</b> ' + esc(l.w || 'Removed from your list.') + '</div>' : '') +
+    (l.sf ? '<div class="alert' + (/another rep|other rep|not yours|owned by/i.test(l.sf) ? ' warn' : '') + '"><b>Salesforce:</b> ' + esc(l.sf) + '</div>' : '') +
+    '<dl class="kv">' +
+      (l.ct ? '<dt>Contact</dt><dd>' + esc(l.ct) + '</dd>' : '') +
+      (phones.length ? '<dt>Phone</dt><dd>' + phones.map(p => '<a href="tel:' + esc(p.replace(/\D/g, '')) + '">' + esc(p) + '</a>').join(', ') + '</dd>' : (l.p ? '<dt>Phone</dt><dd>' + esc(l.p) + '</dd>' : '')) +
+      (emails.length ? '<dt>Email</dt><dd>' + emails.map(e => esc(e)).join(', ') + '</dd>' : '') +
+      (l.t ? '<dt>Town</dt><dd>' + esc(l.t) + '</dd>' : '') +
+      (l.val ? '<dt>Open quote</dt><dd>$' + esc(Number(l.val).toLocaleString(undefined, {maximumFractionDigits: 0})) + '</dd>' : '') +
+      (l.d ? '<dt>Detail</dt><dd>' + esc(l.d) + '</dd>' : '') +
+      (l.nx ? '<dt>Next step</dt><dd>' + esc(l.nx) + '</dd>' : '') +
+      (l.n ? '<dt>On file</dt><dd class="pre">' + esc(l.n) + '</dd>' : '') +
+    '</dl>' +
+    '<div class="btns" style="margin-top:0"><a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/search?q=' + search + '">Search the web</a></div></div>' +
+    '<div class="sec"><h3>Log it</h3><div class="btns" style="margin-top:0">' + ['Call', 'Email', 'Text', 'Visit'].map(c => '<button type="button" class="btn small" data-touch="' + c + '">' + c + '</button>').join('') + '</div>' +
+      '<div style="margin-top:10px;max-width:260px"><label for="ld_status">Status</label><select id="ld_status">' + Object.entries(STATUS).map(([k, n]) => '<option value="' + k + '"' + (g.status === k ? ' selected' : '') + '>' + n + '</option>').join('') + '</select></div></div>' +
+    '<div class="sec"><h3>Your note</h3><textarea id="ld_note" aria-label="Your note on this lead">' + esc(g.note || '') + '</textarea><div class="btns"><button type="button" class="btn primary" id="ld_save">Save note</button></div></div>' +
+    '<div class="sec"><h3>History</h3>' + (hist.length ? '<ul class="hist">' + hist.slice(0, 40).map(h => '<li><time>' + esc(h.d) + '</time><span><b>' + esc(h.who) + '</b> ' + esc(h.text) + '</span></li>').join('') + '</ul>' : '<div class="sub">Nothing logged yet.</div>') + '</div>';
+}
+
+/* ---------- Job sites ---------- */
+const SITE_FILTERS = [['todo', 'To visit'], ['new', 'New this week'], ['visited', 'Visited'], ['mine', 'You added'], ['all', 'All']];
+function siteState(s) {
+  const v = S.visits[s.id];
+  if (s.pending) return 'pending';
+  if (!v) return s.firstSeen && daysAgo(s.firstSeen) <= 7 ? 'new' : 'todo';
+  if (isDead(v)) return 'dead';
+  if (v.stage === NOSIGNS) return 'nosigns';
+  return 'live';
+}
+const STATE = {pending: ['Waiting for phone', 'wait', '#7a4bc4'], new: ['New this week', 'blue', '#e0559b'], todo: ['To visit', '', '#0b6bcb'], dead: ['Done / not a fit', '', '#7b8494'], nosigns: ['No signs yet', 'warn', '#d08a00'], live: ['Visited', 'good', '#1c8a4a']};
+function siteMatches() {
+  const words = $('#siteQ').value.trim().toLowerCase().split(/\s+/).filter(Boolean), f = S.siteFilter;
+  return S.sites.filter(s => {
+    const st = siteState(s);
+    if (f === 'todo' && !['todo', 'new', 'pending'].includes(st)) return false;
+    if (f === 'new' && st !== 'new') return false;
+    if (f === 'visited' && !['dead', 'nosigns', 'live'].includes(st)) return false;
+    if (f === 'mine' && !s.mine) return false;
+    if (!words.length) return true;
+    const h = (s.addr + ' ' + s.town + ' ' + s.builder + ' ' + s.owner + ' ' + s.type).toLowerCase();
+    return words.every(w => h.includes(w));
+  });
+}
+let map, layer, fitted = false;
+function renderMap(list) {
+  if (!window.L || $('#tab-sites').classList.contains('hide')) return;
+  if (!map) {
+    map = L.map('map', {preferCanvas: true}).setView([40.88, -72.6], 9);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'}).addTo(map);
+    layer = L.layerGroup().addTo(map);
+  }
+  layer.clearLayers();
+  for (const s of list) {
+    if (!(s.lat && s.lon)) continue;
+    const sel = s.id === S.siteSel;
+    L.circleMarker([s.lat, s.lon], {radius: sel ? 9 : 5.5, weight: sel ? 3 : 1, color: sel ? '#111' : '#fff', fillColor: STATE[siteState(s)][2], fillOpacity: .95})
+      .bindTooltip(s.addr.split(',')[0]).on('click', () => pickSite(s.id, false)).addTo(layer);
+  }
+  map.invalidateSize();
+}
+function renderSites() {
+  $('#siteChips').innerHTML = SITE_FILTERS.map(([k, n]) => '<button type="button" class="chip" data-f="' + k + '" aria-pressed="' + (S.siteFilter === k) + '">' + n + '</button>').join('');
+  const m = siteMatches().sort((a, b) => String(b.firstSeen || b.date || '').localeCompare(String(a.firstSeen || a.date || '')));
+  const show = m.slice(0, 200), placed = m.filter(s => s.lat && s.lon).length;
+  $('#siteCount').textContent = m.length.toLocaleString() + ' job sites' + (placed < m.length ? ' · ' + (m.length - placed) + ' not on the map yet' : '') + (m.length > show.length ? ' · listing the first ' + show.length : '');
+  $('#siteList').innerHTML = show.length ? show.map(s => { const st = STATE[siteState(s)];
+    return '<button type="button" class="row" data-id="' + esc(s.id) + '" aria-current="' + (S.siteSel === s.id) + '"><b>' + esc(s.addr.split(',').slice(0, 2).join(',')) + '</b><span><span class="tag ' + st[1] + '">' + st[0] + '</span>' + esc(s.builder || s.type || '') + '</span></button>'; }).join('')
+    : '<div class="empty">No job site matches that.</div>';
+  renderMap(m); renderSiteDetail();
+}
+function pickSite(id, pan = true) {
+  S.siteSel = id; renderSites();
+  const s = S.siteById.get(id);
+  if (pan && map && s && s.lat && s.lon) map.setView([s.lat, s.lon], Math.max(map.getZoom(), 14));
+  if (window.innerWidth < 861) $('#siteDetail').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+function renderSiteDetail() {
+  const el = $('#siteDetail'), s = S.siteById.get(S.siteSel);
+  if (!s) return;
+  if (el.dataset.id === s.id && el.contains(document.activeElement) && ['TEXTAREA', 'INPUT', 'SELECT'].includes(document.activeElement.tagName)) return;
+  const v = S.visits[s.id], st = STATE[siteState(s)], d = visitDate(v), note = S.notes[s.id] || '';
+  const opt = (list, cur) => list.map(o => '<option' + (o === cur ? ' selected' : '') + ' value="' + esc(o) + '">' + (o || '—') + '</option>').join('');
+  const vv = v || {stage: '', outcome: '', windows: 'Not in yet', gc: '', contact: '', notes: ''};
+  el.dataset.id = s.id;
+  el.innerHTML =
+    '<div class="pad"><h2>' + esc(s.addr) + '</h2><div class="sub"><span class="tag ' + st[1] + '">' + st[0] + '</span>' + esc(s.town || '') + '</div>' +
+    '<dl class="kv">' +
+      (s.type ? '<dt>Permit</dt><dd>' + esc(s.type) + '</dd>' : '') +
+      (s.date ? '<dt>Date</dt><dd>' + esc(s.date) + (s.firstSeen ? ' · found ' + esc(s.firstSeen) : '') + '</dd>' : '') +
+      (s.builder ? '<dt>Builder</dt><dd>' + esc(s.builder) + ' <button type="button" class="btn small" data-findlead="' + esc(s.builder) + '">Find in leads</button></dd>' : '') +
+      (s.owner ? '<dt>Owner</dt><dd>' + esc(s.owner) + '</dd>' : '') +
+      (!(s.lat && s.lon) ? '<dt>Map</dt><dd>Not placed yet. The phone looks the address up the next time the app is open.</dd>' : '') +
+    '</dl>' +
+    '<div class="btns" style="margin-top:0"><a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(s.addr) + '">Open in Google Maps</a>' +
+    '<a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/search?q=' + encodeURIComponent(s.addr) + '">Search the address</a></div></div>' +
+    '<div class="sec"><h3>Research note</h3><textarea id="sd_note" aria-label="Research note for this job site" placeholder="What you found online: builder, architect, owner, listing, who to ask for…">' + esc(note) + '</textarea>' +
+      '<div class="btns"><button type="button" class="btn primary" id="sd_saveNote">Save note</button></div><div class="sub" style="margin-top:6px">Shows on this site\'s card in the app under “Research notes”.</div></div>' +
+    '<div class="sec"><h3>' + (v ? 'Your visit' + (d ? ' · ' + d.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}) : '') + (v.waiting ? ' · waiting for phone' : '') : 'No visit logged') + '</h3>' +
+      '<details' + (v ? ' open' : '') + '><summary style="cursor:pointer;color:var(--accent);margin-bottom:8px">' + (v ? 'Edit visit' : 'Log a visit from here (dated today)') + '</summary>' +
+      '<div class="grid2"><div><label for="sv_stage">Stage</label><select id="sv_stage">' + opt(STAGES, vv.stage) + '</select></div>' +
+      '<div><label for="sv_outcome">Outcome</label><select id="sv_outcome">' + opt(OUTCOMES, vv.outcome) + '</select></div>' +
+      '<div><label for="sv_windows">Windows</label><select id="sv_windows">' + opt(WINDOWS.includes(vv.windows) ? WINDOWS : [...WINDOWS, vv.windows], vv.windows) + '</select></div>' +
+      '<div><label for="sv_gc">Builder on site</label><input id="sv_gc" type="text" value="' + esc(vv.gc) + '"></div></div>' +
+      '<div style="margin-top:10px"><label for="sv_contact">Contact</label><input id="sv_contact" type="text" value="' + esc(vv.contact) + '"></div>' +
+      '<div style="margin-top:10px"><label for="sv_notes">Visit notes</label><textarea id="sv_notes" style="min-height:120px">' + esc(vv.notes) + '</textarea></div>' +
+      '<div class="btns"><button type="button" class="btn primary" id="sv_save">Save visit</button></div></details></div>';
+}
+
+/* ---------- Add ---------- */
+function leadDupes(name, extra) {
+  const n = coName(name), digits = String(extra && extra.phone || '').replace(/\D/g, ''), em = String(extra && extra.email || '').toLowerCase().trim();
+  if (n.length < 3 && digits.length < 7 && !em) return [];
+  const out = [];
+  for (const l of S.leads) {
+    const c = l._c || (l._c = coName(l.c));
+    // Same name once the filler words are dropped, or one name sitting whole inside the other when it is long enough to mean something.
+    const inside = (a, b) => a.length >= 8 && (' ' + b + ' ').includes(' ' + a + ' ');
+    const hit = (n.length >= 3 && c && (c === n || inside(n, c) || inside(c, n))) || (digits.length >= 10 && l._h.includes(digits.slice(-10))) || (em.length > 5 && l._h.includes(em));
+    if (hit) { out.push(l); if (out.length >= 6) break; }
+  }
+  return out;
+}
+function showLeadDupes() {
+  const d = leadDupes($('#al_company').value, {phone: $('#al_phone').value, email: $('#al_email').value});
+  $('#al_match').innerHTML = d.length ? '<b>Already in your list?</b>' + d.map(l => '<button type="button" data-open="' + esc(l.k) + '">' + leadBadge(l) + esc(l.c) + (l.t ? ' · ' + esc(l.t.split(' / ')[0]) : '') + '</button>').join('') : '';
+}
+function showSiteDupes() {
+  const a = $('#as_addr').value.trim(), k = canon(a);
+  const d = a.length < 5 ? [] : S.sites.filter(s => canon(s.addr) === k || (k.length > 7 && canon(s.addr).startsWith(k))).slice(0, 4);
+  $('#as_match').innerHTML = d.length ? '<b>Already on your map:</b>' + d.map(s => '<button type="button" data-site="' + esc(s.id) + '">' + esc(s.addr) + '</button>').join('') : '';
+}
+function addLead(f) {
+  const company = (f.company || '').trim(); if (!company) return null;
+  const k = 'web-' + norm(company).replace(/ /g, '-').slice(0, 40) + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  send({type: 'lead.add', k, company, contact: (f.contact || '').trim(), phone: (f.phone || '').trim(), email: (f.email || '').trim(), town: (f.town || '').trim(), note: (f.note || '').trim(), source: (f.source || '').trim()}, 'New lead: ' + company);
+  return k;
+}
+function parseBulk() {
+  return $('#bulkText').value.split(/\n/).map(l => l.trim()).filter(Boolean).map(line => {
+    const p = (line.includes('\t') ? line.split('\t') : line.split('|')).map(x => x.trim());
+    return {company: p[0] || '', contact: p[1] || '', phone: p[2] || '', email: p[3] || '', town: p[4] || '', note: p.slice(5).filter(Boolean).join(' | ')};
+  }).filter(r => r.company && !/^company$/i.test(r.company));
+}
+let bulkRows = [];
+function checkBulk() {
+  bulkRows = parseBulk().map(r => ({...r, dupes: leadDupes(r.company, r)}));
+  const fresh = bulkRows.filter(r => !r.dupes.length).length;
+  $('#bulkPreview').innerHTML = bulkRows.length ? '<table><thead><tr><th>Company</th><th>Contact</th><th>Phone</th><th>Email</th><th>Town</th><th>Check</th></tr></thead><tbody>' + bulkRows.map(r =>
+    '<tr><td>' + esc(r.company) + '</td><td>' + esc(r.contact) + '</td><td>' + esc(r.phone) + '</td><td>' + esc(r.email) + '</td><td>' + esc(r.town) + '</td><td>' +
+    (r.dupes.length ? '<span class="tag ' + (r.dupes.some(d => d.s === 'removed') ? 'bad">Off-limits match' : 'warn">Already listed') + '</span> ' + esc(r.dupes[0].c) : '<span class="tag good">New</span>') + '</td></tr>').join('') + '</tbody></table>'
+    : '<div class="sub">Nothing to read yet. Paste one lead per line.</div>';
+  const b = $('#bulkAdd'); b.classList.toggle('hide', !fresh); b.textContent = 'Add the ' + fresh + ' new ' + (fresh === 1 ? 'lead' : 'leads') + (fresh < bulkRows.length ? ' (skip ' + (bulkRows.length - fresh) + ' already listed)' : '');
+}
+
+/* ---------- Activity ---------- */
+function renderActivity() {
+  const applied = new Set(S.backup.applied_ops || []), queued = new Set(S.queue.map(o => o.id)), inbox = new Set((S.inbox.ops || []).map(o => o.id));
+  const waiting = pendingOps().length;
+  $('#actSub').textContent = waiting ? waiting + ' waiting for your phone. They land as soon as Field Hub is open on the iPhone.' : 'Everything you sent has reached your phone.';
+  $('#actList').innerHTML = S.sent.length ? '<table><thead><tr><th>When</th><th>What</th><th>Status</th></tr></thead><tbody>' + S.sent.map(a => {
+    const st = applied.has(a.id) ? '<span class="tag good">On phone ✓</span>' : queued.has(a.id) ? '<span class="tag warn">Not sent yet</span>' : inbox.has(a.id) ? '<span class="tag wait">Waiting for phone</span>' : '<span class="tag good">On phone ✓</span>';
+    return '<tr><td style="white-space:nowrap">' + esc(new Date(a.t).toLocaleString(undefined, {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'})) + '</td><td>' + esc(a.label) + '</td><td>' + st + '</td></tr>'; }).join('') + '</tbody></table>'
+    : '<div class="empty">Nothing sent from this browser yet.</div>';
+  const saved = S.backup.saved_at ? new Date(S.backup.saved_at).toLocaleString() : 'not reported yet';
+  $('#phoneInfo').textContent = 'Phone last checked in: ' + saved + '. Daily permit search last updated: ' + (S.feedUpdated || 'unknown') + '. ' + Object.keys(S.backup.visits || {}).length + ' visits, ' + S.sites.length.toLocaleString() + ' job sites, ' + S.leads.length.toLocaleString() + ' leads.';
+}
+function renderAll() { renderSync(); renderLeads(); renderSites(); renderActivity(); }
+
+/* ---------- Tabs, links, events ---------- */
+function showTab(t) {
+  for (const b of document.querySelectorAll('nav button')) b.setAttribute('aria-selected', b.dataset.tab === t);
+  for (const n of ['leads', 'sites', 'add', 'activity']) $('#tab-' + n).classList.toggle('hide', n !== t);
+  if (t === 'sites') { renderSites(); if (map && !fitted) { fitted = true; const pts = S.sites.filter(s => s.lat && s.lon).map(s => [s.lat, s.lon]); if (pts.length) map.fitBounds(pts, {padding: [20, 20]}); } }
+}
+function openLead(k) { S.leadSel = k; showTab('leads'); renderLeads(); if (window.innerWidth < 861) $('#leadDetail').scrollIntoView({behavior: 'smooth', block: 'start'}); }
+function applyHash() {
+  // hub.html#add?company=…&contact=…&phone=…&email=…&town=…&note=…&source=…   hub.html#site?addr=…&town=…&builder=…&note=…   hub.html#q=…
+  const h = decodeURIComponent(location.hash.slice(1)); if (!h) return;
+  const [name, qs] = h.includes('?') ? h.split(/\?(.*)/s) : [h, ''];
+  const p = new URLSearchParams(location.hash.includes('?') ? location.hash.slice(location.hash.indexOf('?') + 1) : '');
+  if (name === 'add') { showTab('add'); for (const f of ['company', 'contact', 'phone', 'email', 'town', 'note', 'source']) if (p.get(f)) $('#al_' + f).value = p.get(f); showLeadDupes(); }
+  else if (name === 'site') { showTab('add'); for (const f of ['addr', 'town', 'builder', 'note']) if (p.get(f)) $('#as_' + f).value = p.get(f); showSiteDupes(); $('#addSite').scrollIntoView(); }
+  else if (name.startsWith('q=')) { $('#leadQ').value = name.slice(2); renderLeads(); }
+  else if (['leads', 'sites', 'add', 'activity'].includes(name)) showTab(name);
+}
+document.querySelector('nav').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) showTab(b.dataset.tab); });
+$('#leadQ').addEventListener('input', renderLeads);
+$('#siteQ').addEventListener('input', renderSites);
+$('#leadChips').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { S.leadFilter = b.dataset.f; renderLeads(); } });
+$('#siteChips').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { S.siteFilter = b.dataset.f; renderSites(); } });
+$('#leadList').addEventListener('click', e => {
+  const r = e.target.closest('[data-k]'); if (r) return openLead(r.dataset.k);
+  if (e.target.id === 'addFromSearch') { showTab('add'); $('#al_company').value = $('#leadQ').value.trim(); $('#al_contact').focus(); }
+});
+$('#siteList').addEventListener('click', e => { const r = e.target.closest('[data-id]'); if (r) pickSite(r.dataset.id); });
+$('#leadDetail').addEventListener('click', e => {
+  const l = S.leadByK.get(S.leadSel); if (!l) return;
+  const t = e.target.closest('[data-touch]');
+  if (t) { document.activeElement.blur(); send({type: 'lead.touch', k: l.k, ch: t.dataset.touch}, t.dataset.touch + ' logged: ' + l.c); toast(t.dataset.touch + ' logged'); }
+  if (e.target.id === 'ld_save') { const text = $('#ld_note').value.trim(); e.target.blur(); send({type: 'lead.note', k: l.k, text}, 'Note on ' + l.c); toast('Note saved'); }
+});
+$('#leadDetail').addEventListener('change', e => {
+  const l = S.leadByK.get(S.leadSel);
+  if (l && e.target.id === 'ld_status') { const v = e.target.value; e.target.blur(); send({type: 'lead.status', k: l.k, status: v}, 'Status "' + STATUS[v] + '": ' + l.c); toast('Status saved'); }
+});
+$('#siteDetail').addEventListener('click', e => {
+  const s = S.siteById.get(S.siteSel); if (!s) return;
+  const short = s.addr.split(',')[0];
+  if (e.target.id === 'sd_saveNote') { const text = $('#sd_note').value.trim(); e.target.blur(); send({type: 'site.note', site_id: s.id, text}, 'Research note: ' + short); toast('Note saved'); }
+  if (e.target.id === 'sv_save') {
+    const fields = {stage: $('#sv_stage').value, outcome: $('#sv_outcome').value, windows: $('#sv_windows').value, gc: $('#sv_gc').value.trim(), contact: $('#sv_contact').value.trim(), notes: $('#sv_notes').value};
+    e.target.blur(); send({type: 'visit.update', site_id: s.id, fields}, 'Visit updated: ' + short); toast('Visit saved');
+  }
+  const f = e.target.closest('[data-findlead]');
+  if (f) { showTab('leads'); S.leadFilter = 'all'; $('#leadQ').value = coName(f.dataset.findlead) || f.dataset.findlead; renderLeads(); }
+});
+for (const id of ['al_company', 'al_phone', 'al_email']) $('#' + id).addEventListener('input', showLeadDupes);
+$('#as_addr').addEventListener('input', showSiteDupes);
+$('#al_match').addEventListener('click', e => { const b = e.target.closest('[data-open]'); if (b) openLead(b.dataset.open); });
+$('#as_match').addEventListener('click', e => { const b = e.target.closest('[data-site]'); if (b) { showTab('sites'); S.siteFilter = 'all'; pickSite(b.dataset.site); } });
+$('#addLead').addEventListener('submit', e => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  const off = leadDupes(f.company, f).filter(l => l.s === 'removed');
+  if (off.length && !e.target.dataset.sure) { e.target.dataset.sure = '1'; $('#al_match').insertAdjacentHTML('afterbegin', '<div class="alert bad">This looks like <b>' + esc(off[0].c) + '</b>, which is off-limits: ' + esc(off[0].w || 'removed from your list') + '. Press Add lead again to add it anyway.</div>'); return; }
+  delete e.target.dataset.sure;
+  const k = addLead(f); if (!k) return;
+  e.target.reset(); $('#al_match').innerHTML = ''; toast('Lead added: ' + f.company.trim()); openLead(k);
+});
+$('#addSite').addEventListener('submit', e => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target)), addr = f.addr.trim(); if (!addr) return;
+  const full = /,/.test(addr) || !f.town.trim() ? addr : addr + ', ' + f.town.trim() + ', NY';
+  if (S.siteById.has(siteKey(full)) || S.sites.some(s => canon(s.addr) === canon(full))) { const s = S.sites.find(s => canon(s.addr) === canon(full)); toast('That address is already on your map'); showTab('sites'); S.siteFilter = 'all'; pickSite(s.id); return; }
+  send({type: 'site.add', addr: full, town: f.town.trim(), kind: f.kind, builder: f.builder.trim(), note: f.note.trim()}, 'New job site: ' + full.split(',')[0]);
+  e.target.reset(); $('#as_match').innerHTML = ''; toast('Job site added'); showTab('sites'); S.siteFilter = 'mine'; pickSite(siteKey(full));
+});
+$('#bulkCheck').addEventListener('click', checkBulk);
+$('#bulkAdd').addEventListener('click', () => {
+  const rows = bulkRows.filter(r => !r.dupes.length); if (!rows.length) return;
+  for (const r of rows) addLead(r);
+  toast(rows.length + (rows.length === 1 ? ' lead added' : ' leads added')); $('#bulkText').value = ''; $('#bulkPreview').innerHTML = ''; $('#bulkAdd').classList.add('hide'); bulkRows = [];
+  S.leadFilter = 'mine'; showTab('leads'); renderLeads();
+});
+$('#refreshNow').addEventListener('click', async () => { await pollBackup(true); flush(); toast('Refreshed'); });
+$('#disconnect').addEventListener('click', () => { if (confirm('Remove the saved token from this browser? Your data is not touched.')) { store.del('fh.token'); location.reload(); } });
+window.addEventListener('hashchange', applyHash);
+
+/* ---------- Connect ---------- */
+$('#connectForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const t = $('#tokenInput').value.trim(), msg = $('#connectMsg'); if (!t) return;
+  msg.textContent = 'Checking…'; token = t;
+  try {
+    const r = await gh('/contents/backup.json', {raw: true});
+    if (r.status === 401) throw new Error('GitHub did not accept that token. Copy it again and paste the whole thing.');
+    if (r.status === 403 || r.status === 404) throw new Error('That token cannot open fieldhub-data. Check that the repository is selected and Contents is set to Read and write.');
+    if (!r.ok) throw new Error('GitHub answered ' + r.status + '. Try again in a minute.');
+    store.set('fh.token', t); $('#tokenInput').value = ''; start();
+  } catch (err) { token = ''; msg.textContent = err.message === 'Failed to fetch' ? 'Could not reach GitHub. Check your connection and try again.' : err.message; }
+});
+function start() {
+  $('#connect').classList.add('hide'); $('#app').classList.remove('hide');
+  loadAll().catch(e => { S.err = String(e.message || e); renderSync(); });
+}
+if (token) start(); else $('#connect').classList.remove('hide');
+</script>
+</body>
+</html>
