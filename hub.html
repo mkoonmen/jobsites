@@ -132,6 +132,8 @@ code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:13px}
 .col .cardnote{padding:0 12px 8px}
 .col .list{max-height:calc(100vh - 210px)}
 
+.leaflet-tooltip.rnum{background:none;border:0;box-shadow:none;color:#fff;font-weight:700;font-size:11.5px;padding:0}
+.leaflet-tooltip.rnum::before{display:none}
 /* Photos */
 .photos{display:flex;gap:8px;flex-wrap:wrap}
 .photos img{width:132px;height:100px;object-fit:cover;border-radius:8px;cursor:zoom-in;border:1px solid var(--line);background:var(--soft)}
@@ -139,6 +141,26 @@ code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:13px}
 #lightbox{position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:4000;display:flex;align-items:center;justify-content:center;cursor:zoom-out}
 #lightbox img{max-width:96vw;max-height:94vh;border-radius:6px}
 .inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* Search everything */
+.gsearch{position:relative;flex:1;min-width:180px;max-width:360px}
+.gsearch input{padding:6px 10px}
+#gResults{position:absolute;top:calc(100% + 6px);left:0;right:0;min-width:300px;max-height:70vh;overflow:auto;z-index:1500}
+#gResults h4{margin:0;padding:8px 12px 2px;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+/* Route */
+.stop{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid var(--line);font-size:14px}
+.stop:last-child{border-bottom:0}
+.stop .num{flex:none;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.stop .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:0;background:none;text-align:left;cursor:pointer;padding:0}
+.stop .mini{border:1px solid var(--line);background:var(--panel);border-radius:6px;width:26px;height:26px;cursor:pointer;flex:none;line-height:1}
+.stop .mini:hover{background:var(--soft)}
+.bars{display:flex;align-items:flex-end;gap:10px;height:120px;padding:6px 14px 0}
+.bars .wk{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px;font-size:11.5px;color:var(--mute)}
+.bars .pair{display:flex;align-items:flex-end;gap:3px;height:100%;width:100%;justify-content:center}
+.bars .bar{width:42%;max-width:26px;border-radius:4px 4px 0 0;min-height:2px;position:relative}
+.bars .bar span{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--ink)}
+.bars .v{background:var(--good)} .bars .t{background:var(--accent)}
+.key{display:flex;gap:14px;padding:8px 14px 12px;font-size:12.5px;color:var(--mute)}
+.key i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}
 .inline input[type=date],.inline input[type=number]{width:auto}
 .foot{margin-top:26px;text-align:center;font-size:12px;color:var(--mute)}
 </style>
@@ -174,9 +196,11 @@ code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:13px}
       <button role="tab" data-tab="leads" aria-selected="false">Leads</button>
       <button role="tab" data-tab="pipeline" aria-selected="false">Pipeline</button>
       <button role="tab" data-tab="sites" aria-selected="false">Job sites</button>
+      <button role="tab" data-tab="builders" aria-selected="false">Builders</button>
       <button role="tab" data-tab="add" aria-selected="false">Add</button>
       <button role="tab" data-tab="activity" aria-selected="false">Activity</button>
     </nav>
+    <div class="gsearch"><input id="globalQ" type="search" placeholder="Search everything" aria-label="Search leads, job sites and builders" autocomplete="off"><div id="gResults" class="card hide"></div></div>
     <button class="sync" id="syncBtn" type="button" title="Click to refresh now"><span id="dot" class="dot"></span><span id="syncText">Loading…</span></button>
   </header>
   <div id="banner" class="banner hide"></div>
@@ -220,6 +244,7 @@ code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:13px}
               <input id="siteQ" type="search" placeholder="Search address, town or builder" aria-label="Search job sites" autocomplete="off">
               <select id="siteTown" aria-label="Town"><option value="">All towns</option></select>
             </div>
+            <div class="toolrow"><select id="siteSort" aria-label="Sort job sites" style="max-width:none;flex:1"><option value="best">Best first</option><option value="new">Newest first</option><option value="near">Nearest to the open site</option></select></div>
             <div class="chips" id="siteChips"></div>
           </div>
           <div class="count"><span id="siteCount"></span><button type="button" id="siteCsv">Download this list</button></div>
@@ -238,8 +263,24 @@ code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:13px}
               <span><i style="background:#7a4bc4"></i>Waiting for phone</span>
             </div>
           </div>
+          <div class="card" id="routeCard" style="margin-bottom:14px"></div>
           <div class="card detail" id="siteDetail"><div class="empty">Pick a job site from the list or the map.</div></div>
         </div>
+      </div>
+    </section>
+
+    <!-- BUILDERS -->
+    <section id="tab-builders" class="hide">
+      <div class="split">
+        <div class="card">
+          <div class="tools">
+            <input id="bldQ" type="search" placeholder="Search builders" aria-label="Search builders" autocomplete="off">
+            <div class="chips" id="bldChips"></div>
+          </div>
+          <div class="count"><span id="bldCount"></span><button type="button" id="bldCsv">Download this list</button></div>
+          <div class="list" id="bldList"></div>
+        </div>
+        <div class="card detail" id="bldDetail"><div class="empty">Every builder named on a permit or on one of your visits, with their job sites. Pick one on the left.</div></div>
       </div>
     </section>
 
@@ -311,7 +352,7 @@ code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:13px}
         </div>
       </div>
     </section>
-    <div class="foot">Field Hub website, version 2</div>
+    <div class="foot">Field Hub website, version 3</div>
   </main>
 </div>
 <div id="toast" class="toast hide" role="status" aria-live="polite"></div>
@@ -331,7 +372,10 @@ const OUTCOMES = ['', 'Talked to GC', 'Left card', 'No one there', "Couldn't acc
 const WINDOWS = ['Not in yet', 'Pella', 'Andersen', 'Marvin', 'Kolbe', 'Loewen', 'Windsor', 'Other'];
 const STATUS = {'': 'No status', interested: 'Interested', quote: 'Quote out', nurture: 'Later', not_interested: 'Not interested', dnc: 'Do not contact', off_limits: 'Off-limits (other rep)'};
 // Kinds of change that need a newer phone app. They wait in this browser until the phone reports it understands them.
-const NEEDS = {'lead.research': 2, 'lead.next': 2, 'lead.update': 2, 'site.update': 2};
+const NEEDS = {'lead.research': 2, 'lead.next': 2, 'lead.update': 2, 'site.update': 2, 'site.desk': 3, 'route.set': 3};
+const TOP_CAPS = 3;
+const EMAIL_SUBJECT = 'Pella windows & doors for your projects';
+const EMAIL_BODY = "Hi {first},\n\nI'm Michael Koonmen, trade sales rep with Pella Windows & Doors of Long Island. I work with builders and remodelers around {town} and would like to help on your upcoming projects: quotes, takeoffs from plans, and a showroom in Riverhead and Roslyn Heights for your clients.\n\nIs there a project I could quote for you?\n\nThanks,\nMichael Koonmen\nTrade Sales Representative, Pella Windows & Doors of Long Island";
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
@@ -355,7 +399,8 @@ const S = {
   baseSites: [], baseLeads: [], fresh: [], older: [], backup: {}, haveBackup: false, etag: null,
   inbox: {ops: []}, queue: store.get('fh.queue', []), sent: store.get('fh.sent', []),
   sites: [], siteById: new Map(), leads: [], leadByK: new Map(), log: {}, visits: {}, notes: {},
-  leadSel: null, siteSel: null, leadFilter: 'all', siteFilter: 'best', tab: 'today', err: '', lastOk: 0, feedUpdated: ''
+  leadSel: null, siteSel: null, leadFilter: 'all', siteFilter: 'best', tab: 'today', err: '', lastOk: 0, feedUpdated: '',
+  desk: {}, route: store.get('fh.route', []), routeName: '', near: null, builders: [], bldSel: null, bldFilter: 'new'
 };
 
 /* ---------- GitHub ---------- */
@@ -402,6 +447,9 @@ const prettyDue = d => { const n = -daysAgo(d); const day = new Date(d + 'T12:00
 const agoDay = d => { const n = daysAgo(d); return n <= 0 ? 'today' : n === 1 ? 'yesterday' : n < 14 ? n + 'd ago' : n < 60 ? Math.floor(n / 7) + 'w ago' : Math.floor(n / 30) + 'mo ago'; };
 const isZoning = s => { const t = (s.type || '').toLowerCase(); return ['bza', 'zba', 'zoning', 'variance', 'hearing', 'planning board', 'arb', 'subdivision'].some(w => t.includes(w)); };
 
+const miles = (a, b) => { const R = 3958.8, r = x => x * Math.PI / 180, dLa = r(b.lat - a.lat), dLo = r(b.lon - a.lon); const h = Math.sin(dLa / 2) ** 2 + Math.cos(r(a.lat)) * Math.cos(r(b.lat)) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); };
+const placed = s => !!(s && s.lat && s.lon);
+
 /** How worth a stop a site is, and why. Same rules as the app's pins. */
 function rating(s) {
   const v = S.visits[s.id];
@@ -414,6 +462,8 @@ function rating(s) {
     if (['Siding / finish', 'Finished', 'Windows in'].includes(v.stage)) return ['low', 'Too far along (' + v.stage.toLowerCase() + ')'];
     return ['maybe', 'Visited ' + fmtDay(visitDate(v))];
   }
+  if (S.desk[s.id] === 'active') return ['hot', 'Looked active in your desk check'];
+  if (S.desk[s.id] === 'nothing') return ['low', 'Looked empty in your desk check'];
   const d = (s.date || '').length >= 10 ? daysAgo(s.date) : 120, mo = Math.floor(d / 30), type = (s.type || '').toLowerCase();
   if (isZoning(s)) {
     if (d < 180) return ['low', 'Zoning hearing only. These rarely have anything started'];
@@ -474,6 +524,12 @@ function derive() {
     if (o.type === 'visit.update') { const v = S.visits[o.site_id] || {date: o.t / 1000 - 978307200, gc: '', sign: false, contact: '', windows: 'Not in yet', stage: '', outcome: '', notes: ''}; S.visits[o.site_id] = {...v, ...o.fields, waiting: true}; }
   }
   S.sites = all; S.siteById = new Map(all.map(s => [s.id, s]));
+  // Desk checks: "looks active" stays; "nothing yet" counts for 45 days, same as the app.
+  S.desk = {};
+  for (const id of Object.keys((b.desk || {}).active || {})) S.desk[id] = 'active';
+  for (const [id, t] of Object.entries((b.desk || {}).nothing || {})) if (Date.now() / 1000 - t < 45 * 86400 && !S.desk[id]) S.desk[id] = 'nothing';
+  for (const o of pend) if (o.type === 'site.desk') { if (o.verdict) S.desk[o.site_id] = o.verdict; else delete S.desk[o.site_id]; }
+  S.builders = null;
 
   // Leads
   const custom = (b.custom_leads || []).map(l => ({...l, mine: true}));
@@ -605,10 +661,10 @@ function renderSync() {
   else if (held) { dot.className = 'dot wait'; text = held + (held === 1 ? ' change' : ' changes') + ' waiting for the app update'; }
   else { dot.className = 'dot live'; text = saved ? 'Up to date · phone checked in ' + ago(saved) : 'Connected'; }
   $('#syncText').textContent = text;
-  const ban = $('#banner'), old = S.haveBackup && !('applied_ops' in S.backup), behind = S.haveBackup && !old && caps() < 2;
+  const ban = $('#banner'), old = S.haveBackup && !('applied_ops' in S.backup), behind = S.haveBackup && !old && caps() < TOP_CAPS;
   ban.classList.toggle('hide', !(old || behind));
   if (old) ban.textContent = 'Your phone is on an older version of the app. Update Field Hub in TestFlight and open it once; until then, what you add here waits in line.';
-  else if (behind) ban.textContent = 'Update Field Hub on your phone to build 50 (TestFlight) to get follow-up dates, research log entries and corrections from this site. Until then those wait here; leads, job sites, notes and logged contact still go through.';
+  else if (behind) ban.textContent = 'Update Field Hub on your phone to build 50 (TestFlight) to get follow-up dates, research log entries, corrections, desk checks and routes from this site. Until then those wait here; leads, job sites, notes and logged contact still go through.';
 }
 
 /* ---------- Shared bits ---------- */
@@ -660,6 +716,7 @@ function withDrafts(el, sameCard, draw) {
   for (const [id, v] of Object.entries(drafts)) { const i = el.querySelector('#' + id); if (i) i.value = v; }
   for (const id of open) { const d = id && el.querySelector('#' + id); if (d) d.open = true; }
 }
+const b_hist = () => S.backup.visit_history || {};
 const typing = el => el.contains(document.activeElement) && ['TEXTAREA', 'INPUT', 'SELECT'].includes(document.activeElement.tagName);
 
 /* ---------- Today ---------- */
@@ -694,6 +751,20 @@ function renderToday() {
   const touchesWeek = Object.values(S.log).reduce((n, g) => n + (g.touches || []).filter(x => x.d >= ymd(monday)).length, 0);
   const quoteTotal = quotes.reduce((n, l) => n + quoteValue(l), 0);
   const nav = $('#navDue'); nav.textContent = dueNow.length; nav.classList.toggle('hide', !dueNow.length);
+  const yday = plusDays(-1);
+  const justVisited = S.sites.filter(s => { const d = visitDate(S.visits[s.id]); return d && ymd(d) >= yday; }).sort((a, b) => S.visits[b.id].date - S.visits[a.id].date);
+  const justTouched = S.leads.filter(l => { const g = S.log[l.k]; return g && [...(g.touches || []), ...(g.results || [])].some(x => x.d >= yday); });
+  const firstCalls = open.filter(l => stage(l) === 'cold' && l.v === 'Reach out now' && /\d{3}\D*\d{4}/.test(l.p || '')).sort((a, b) => (a.a === 'East End' ? 0 : 1) - (b.a === 'East End' ? 0 : 1) || a.c.localeCompare(b.c));
+  // Last six weeks, Monday to Sunday: site visits and outgoing contact.
+  const weeks = []; for (let i = 5; i >= 0; i--) { const a = new Date(monday); a.setDate(a.getDate() - 7 * i); const z = new Date(a); z.setDate(z.getDate() + 7); weeks.push({a: ymd(a), z: ymd(z), label: a.toLocaleDateString(undefined, {month: 'short', day: 'numeric'}), v: 0, t: 0}); }
+  const wk = d => weeks.find(w => d >= w.a && d < w.z);
+  for (const v of Object.values(S.visits)) { const d = visitDate(v), w = d && wk(ymd(d)); if (w) w.v++; }
+  for (const hist of Object.values(b_hist())) for (const v of hist) { const d = appDate(v.date), w = d && wk(ymd(d)); if (w) w.v++; }
+  for (const l of S.leads) { if (!(l.tl && l.tl.length) && !S.log[l.k]) continue; for (const x of touches(l)) if (x.dir === 'out') { const w = wk(String(x.d).slice(0, 10)); if (w) w.t++; } }
+  const top = Math.max(1, ...weeks.map(w => Math.max(w.v, w.t)));
+  const chart = '<div class="card"><div class="cardh"><h3>Your last six weeks</h3></div><div class="cardnote">Week starting on the date shown.</div><div class="bars" role="img" aria-label="' + esc(weeks.map(w => 'Week of ' + w.label + ': ' + w.v + ' visits, ' + w.t + ' contacts').join('; ')) + '">' +
+    weeks.map(w => '<div class="wk"><div class="pair"><div class="bar v" style="height:' + Math.round(w.v / top * 82) + '%"><span>' + (w.v || '') + '</span></div><div class="bar t" style="height:' + Math.round(w.t / top * 82) + '%"><span>' + (w.t || '') + '</span></div></div>' + esc(w.label) + '</div>').join('') +
+    '</div><div class="key"><span><i style="background:var(--good)"></i>Site visits</span><span><i style="background:var(--accent)"></i>Calls, emails and texts out</span></div></div>';
 
   $('#stats').innerHTML = [
     [dueNow.length, 'next steps due', 'due', dueNow.length ? ' hotnum' : ''], [replied.length, 'wrote back', 'replied', ''], [follow.length, 'need a follow-up', 'followup', ''],
@@ -711,7 +782,10 @@ function renderToday() {
     card('New permits this week', 'Found by the daily 6 AM search.' + (S.feedUpdated ? ' It last added sites on ' + esc(S.feedUpdated) + '.' : ''), fresh.slice(0, 8).map(s => siteRow(s)), 'sites:new', fresh.length),
     card('Best bets to visit', 'New homes two to ten months after the permit, not visited yet.', best.slice(0, 8).map(s => siteRow(s, esc(rate(s)[1]))), 'sites:best', best.length),
     card('Go back to', 'Check-back dates that have come up, follow-ups, and live sites with windows still open.', back.slice(0, 8).map(s => siteRow(s, esc(rate(s)[1]))), 'sites:back', back.length),
-    card('Builders you met, not in your leads', 'Named on your site visits.', spotted.slice(0, 8).map(x => '<div class="rowflex">' + siteRow(x.site, esc(x.name + (x.contact ? ' · ' + x.contact : ''))) + '<button type="button" class="btn small" data-addgc="' + esc(x.site.id) + '">Add as lead</button></div>'), null, spotted.length)
+    card('Builders you met, not in your leads', 'Named on your site visits.', spotted.slice(0, 8).map(x => '<div class="rowflex">' + siteRow(x.site, esc(x.name + (x.contact ? ' · ' + x.contact : ''))) + '<button type="button" class="btn small" data-addgc="' + esc(x.site.id) + '">Add as lead</button></div>'), 'builders', spotted.length),
+    card('Logged today and yesterday', 'What you put in on the phone or here.', [...justVisited.slice(0, 8).map(s => { const v = S.visits[s.id]; return siteRow(s, esc([v.stage, v.outcome, v.gc].filter(Boolean).join(' · ') || 'Visit logged')); }), ...justTouched.slice(0, 8).map(l => leadRow(l, esc((touches(l)[0] || {}).ch ? touches(l)[0].ch + ' logged ' + agoDay(touches(l)[0].d) : 'Logged')))], null, justVisited.length + justTouched.length),
+    card('First calls', 'Never contacted, phone on file, East End first.', firstCalls.slice(0, 10).map(l => leadRow(l, esc([(String(l.p).match(/\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/) || [''])[0], (l.t || '').split(' / ')[0]].filter(Boolean).join(' · ')))), 'now', firstCalls.length),
+    chart
   ].filter(Boolean);
   $('#dash').innerHTML = cards.join('') || '<div class="card empty">Nothing needs you right now.</div>';
 }
@@ -766,6 +840,9 @@ function renderLeadDetail() {
   const research = (g.research || []).slice().reverse();
   const sg = stage(l), search = encodeURIComponent(l.c + ' ' + (l.t || '').split(' / ')[0] + ' NY');
   const o = l.orig || l;
+  const quoteOpen = g.status === 'quote' || (l.s === 'working' && Number(l.val) > 0);
+  const mailOk = !offLimits(l) && !quoteOpen && !['dnc', 'not_interested'].includes(g.status || '');
+  const intro = sg === 'cold'; // the intro wording only fits someone you've never contacted
   withDrafts(el, same, () => {
     el.dataset.k = l.k;
     el.innerHTML =
@@ -786,10 +863,11 @@ function renderLeadDetail() {
     '</dl>' +
     '<div class="btns" style="margin-top:0">' +
       (phones[0] ? '<button type="button" class="btn small" data-copy="' + esc(phones[0]) + '">Copy phone</button>' : '') +
-      (emails[0] ? '<button type="button" class="btn small" data-copy="' + esc(emails[0]) + '">Copy email</button><a class="btn small" target="_blank" rel="noopener" href="https://outlook.office.com/mail/deeplink/compose?to=' + encodeURIComponent(emails[0]) + '">Draft email in Outlook</a>' : '') +
+      (emails[0] ? '<button type="button" class="btn small" data-copy="' + esc(emails[0]) + '">Copy email</button>' + (mailOk ? '<a class="btn small" target="_blank" rel="noopener" href="https://outlook.office.com/mail/deeplink/compose?to=' + encodeURIComponent(emails[0]) + (intro ? '&subject=' + encodeURIComponent(EMAIL_SUBJECT) + '&body=' + encodeURIComponent(EMAIL_BODY.replace('{first}', (l.ct || '').trim().split(/\s+/)[0] || 'there').replace('{town}', (l.t || '').split(' / ')[0] || 'Long Island')) : '') + '">' + (intro ? 'Draft intro email in Outlook' : 'Draft email in Outlook') + '</a>' : '') : '') +
       '<a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/search?q=' + search + '">Search the web</a>' +
       '<button type="button" class="btn small" data-copy="' + esc(location.origin + location.pathname + '#lead/' + encodeURIComponent(l.k)) + '">Copy link to this lead</button>' +
     '</div>' +
+    (emails[0] && !mailOk ? '<div class="sub" style="margin-top:6px">' + (offLimits(l) ? 'Off-limits: no email.' : quoteOpen ? 'Open quote: call for a decision, no email.' : 'Marked not interested or do not contact: no email.') + '</div>' : '') +
     '<details id="ld_editbox" style="margin-top:10px"><summary style="cursor:pointer;color:var(--accent)">Correct the contact details</summary>' +
       '<div class="grid2" style="margin-top:8px">' +
       '<div><label for="le_ct">Contact person</label><input class="draft" id="le_ct" type="text" value="' + esc(l.ct) + '"></div>' +
@@ -866,7 +944,9 @@ function renderMap(list) {
   if (!window.L || S.tab !== 'sites') return;
   if (!map) {
     map = L.map('map', {preferCanvas: true}).setView([40.88, -72.6], 9);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'}).addTo(map);
+    const street = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'}).addTo(map);
+    const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {maxZoom: 19, attribution: 'Imagery &copy; Esri, Maxar, Earthstar Geographics'});
+    L.control.layers({'Map': street, 'Satellite': sat}, null, {collapsed: false}).addTo(map);
     layer = L.layerGroup().addTo(map);
   }
   layer.clearLayers();
@@ -876,6 +956,10 @@ function renderMap(list) {
     L.circleMarker([s.lat, s.lon], {radius: sel ? 9 : hot ? 6.5 : 5.5, weight: sel ? 3 : 1, color: sel ? '#111' : '#fff', fillColor: hot ? '#d2451e' : STATE[st][2], fillOpacity: .95})
       .bindTooltip(s.addr.split(',')[0] + (s.builder ? ' · ' + s.builder : '')).on('click', () => pickSite(s.id, false)).addTo(layer);
   }
+  // The route you're building: numbered dark stops joined by a dashed line.
+  const stops = routeSites().filter(placed);
+  if (stops.length > 1) L.polyline(stops.map(s => [s.lat, s.lon]), {color: '#111', weight: 2.5, dashArray: '5 7', interactive: false}).addTo(layer);
+  routeSites().forEach((s, i) => { if (placed(s)) L.circleMarker([s.lat, s.lon], {radius: 10, weight: 2, color: '#fff', fillColor: '#111', fillOpacity: 1}).bindTooltip(String(i + 1), {permanent: true, direction: 'center', className: 'rnum'}).on('click', () => pickSite(s.id, false)).addTo(layer); });
   map.invalidateSize();
   if (!fitted) { const pts = list.filter(s => s.lat && s.lon).map(s => [s.lat, s.lon]); if (pts.length) { fitted = true; map.fitBounds(pts, {padding: [20, 20], maxZoom: 14}); } }
 }
@@ -884,19 +968,55 @@ function renderSites() {
   $('#siteChips').innerHTML = SITE_FILTERS.map(([k, n]) => '<button type="button" class="chip" data-f="' + k + '" aria-pressed="' + (S.siteFilter === k) + '">' + n + '</button>').join('');
   const sel = $('#siteTown'), towns = [...new Set(S.sites.map(s => s.town).filter(Boolean))].sort();
   if (sel.options.length !== towns.length + 1) { const cur = sel.value; sel.innerHTML = '<option value="">All towns</option>' + towns.map(t => '<option>' + esc(t) + '</option>').join(''); sel.value = cur; }
-  const byVisit = ['visited', 'back'].includes(S.siteFilter);
-  const m = siteMatches().sort((a, b) => byVisit ? ((S.visits[b.id] || {}).date || 0) - ((S.visits[a.id] || {}).date || 0) : (ORDER[rate(a)[0]] - ORDER[rate(b)[0]]) || String(b.firstSeen || b.date || '').localeCompare(String(a.firstSeen || a.date || '')));
+  const byVisit = ['visited', 'back'].includes(S.siteFilter), sort = $('#siteSort').value;
+  const anchor = sort === 'near' ? S.siteById.get(S.near) : null, newest = (a, b) => String(b.firstSeen || b.date || '').localeCompare(String(a.firstSeen || a.date || ''));
+  const dist = s => placed(anchor) && placed(s) ? miles(anchor, s) : 9999;
+  $('#siteSort').options[2].textContent = placed(anchor) ? 'Nearest to ' + anchor.addr.split(',')[0] : 'Nearest to the open site';
+  const m = siteMatches().sort((a, b) => placed(anchor) ? dist(a) - dist(b) : sort === 'new' ? newest(a, b) : byVisit ? ((S.visits[b.id] || {}).date || 0) - ((S.visits[a.id] || {}).date || 0) : (ORDER[rate(a)[0]] - ORDER[rate(b)[0]]) || newest(a, b));
   renderSites.list = m;
-  const show = m.slice(0, 250), placed = m.filter(s => s.lat && s.lon).length;
-  $('#siteCount').textContent = m.length.toLocaleString() + ' job sites' + (placed < m.length ? ' · ' + (m.length - placed) + ' not on the map yet' : '') + (m.length > show.length ? ' · listing the first ' + show.length : '');
-  $('#siteList').innerHTML = show.length ? show.map(s => siteRow(s)).join('') : '<div class="empty">No job site matches that.</div>';
-  renderMap(m); renderSiteDetail();
+  const show = m.slice(0, 250), onMap = m.filter(placed).length;
+  $('#siteCount').textContent = m.length.toLocaleString() + ' job sites' + (onMap < m.length ? ' · ' + (m.length - onMap) + ' not on the map yet' : '') + (m.length > show.length ? ' · listing the first ' + show.length : '');
+  $('#siteList').innerHTML = show.length ? show.map(s => siteRow(s, placed(anchor) && placed(s) && s.id !== anchor.id ? esc(dist(s).toFixed(1) + ' mi · ' + (s.builder || s.type || '')) : undefined)).join('') : '<div class="empty">No job site matches that.</div>';
+  renderMap(m); renderRoute(); renderSiteDetail();
 }
 function pickSite(id, pan = true) {
   S.siteSel = id; setHash('site/' + encodeURIComponent(id)); renderSites();
   const s = S.siteById.get(id);
   if (pan && map && s && s.lat && s.lon) map.setView([s.lat, s.lon], Math.max(map.getZoom(), 14));
   if (window.innerWidth < 861) $('#siteDetail').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+/* ----- Route planner: build a route here, drive it on the phone ----- */
+const routeSites = () => S.route.map(id => S.siteById.get(id)).filter(Boolean);
+function setRoute(ids) { S.route = [...new Set(ids)]; store.set('fh.route', S.route); renderSites(); }
+function shortestOrder() {
+  // Keeps your first stop first, then always drives to the closest stop left, then untangles crossings.
+  const st = routeSites(), fixed = st.filter(placed), loose = st.filter(s => !placed(s));
+  if (fixed.length < 3) return;
+  const order = [fixed[0]], left = fixed.slice(1);
+  while (left.length) { const last = order[order.length - 1]; let bi = 0; for (let i = 1; i < left.length; i++) if (miles(last, left[i]) < miles(last, left[bi])) bi = i; order.push(left.splice(bi, 1)[0]); }
+  const len = o => o.reduce((n, s, i) => i ? n + miles(o[i - 1], s) : 0, 0);
+  for (let pass = 0, better = true; better && pass < 20; pass++) { better = false; for (let i = 1; i < order.length - 1; i++) for (let j = i + 1; j < order.length; j++) { const alt = [...order.slice(0, i), ...order.slice(i, j + 1).reverse(), ...order.slice(j + 1)]; if (len(alt) + 0.01 < len(order)) { order.splice(0, order.length, ...alt); better = true; } } }
+  setRoute([...order, ...loose].map(s => s.id)); toast('Reordered: about ' + len(order).toFixed(0) + ' miles between stops');
+}
+const gpoint = s => placed(s) ? s.lat.toFixed(6) + ',' + s.lon.toFixed(6) : s.addr;
+function renderRoute() {
+  const el = $('#routeCard'); if (!el) return;
+  if (typing(el)) return;
+  const st = routeSites(), onPhone = S.backup.route, pendingRoute = pendingOps().filter(o => o.type === 'route.set').pop();
+  const total = st.filter(placed).reduce((n, s, i, a) => i ? n + miles(a[i - 1], s) : 0, 0);
+  const first10 = st.slice(0, 10);
+  const gmaps = st.length ? 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + encodeURIComponent(gpoint(first10[first10.length - 1])) + (first10.length > 1 ? '&waypoints=' + encodeURIComponent(first10.slice(0, -1).map(gpoint).join('|')) : '') : '';
+  const sel = S.siteById.get(S.siteSel);
+  el.innerHTML = '<div class="cardh"><h3>Route' + (st.length ? ' (' + st.length + (st.length === 1 ? ' stop' : ' stops') + (total >= 1 ? ' · about ' + total.toFixed(0) + ' mi between stops' : '') + ')' : '') + '</h3>' + (st.length ? '<button type="button" id="rt_clear">Clear</button>' : '') + '</div>' +
+    (st.length ? '<div>' + st.map((s, i) => '<div class="stop"><span class="num">' + (i + 1) + '</span><button type="button" class="nm" data-id="' + esc(s.id) + '">' + esc(s.addr.split(',').slice(0, 2).join(',')) + (s.builder ? ' <span class="sub">· ' + esc(s.builder) + '</span>' : '') + '</button>' +
+        '<button type="button" class="mini" data-mv="-1" data-i="' + i + '" aria-label="Move up"' + (i ? '' : ' disabled') + '>↑</button><button type="button" class="mini" data-mv="1" data-i="' + i + '" aria-label="Move down"' + (i < st.length - 1 ? '' : ' disabled') + '>↓</button><button type="button" class="mini" data-rm="' + esc(s.id) + '" aria-label="Remove from route">×</button></div>').join('') + '</div>' +
+      '<div class="pad" style="padding-top:10px"><div class="inline"><label for="rt_name" style="margin:0">Name</label><input class="draft" id="rt_name" type="text" style="flex:1;min-width:160px" value="' + esc(S.routeName || 'Route for ' + new Date().toLocaleDateString(undefined, {weekday: 'short', month: 'short', day: 'numeric'})) + '"></div>' +
+      '<div class="btns"><button type="button" class="btn primary" id="rt_send">Send to my phone</button>' + (st.length > 2 ? '<button type="button" class="btn" id="rt_short">Shortest order</button>' : '') +
+      '<a class="btn" target="_blank" rel="noopener" href="' + esc(gmaps) + '">Open in Google Maps' + (st.length > 10 ? ' (first 10)' : '') + '</a></div>' +
+      '<div class="sub" style="margin-top:8px">The first stop stays first. On the phone it shows on Today with a Drive button and one-tap Apple Maps.</div></div>'
+      : '<div class="cardnote" style="padding-bottom:12px">Build a route here and drive it on the phone. Open a site and press “Add to route”, or <button type="button" class="btn small" id="rt_top">add the first 8 on this list</button></div>') +
+    (pendingRoute ? '<div class="cardnote"><span class="tag wait">' + (needs(pendingRoute) > caps() ? 'Waiting for app update' : 'Waiting for phone') + '</span>' + esc(pendingRoute.name || 'Route') + ', ' + (pendingRoute.ids || []).length + ' stops sent.</div>'
+      : onPhone && (onPhone.ids || []).length ? '<div class="cardnote">On your phone now: ' + esc(onPhone.name) + ', ' + onPhone.ids.length + ' stops. <button type="button" class="btn small" id="rt_load">Load it here</button></div>' : '');
 }
 // Photos live in the private repository under photos/<site id>/. They are listed when you open a site; big ones load when you ask.
 const photoCache = new Map();
@@ -953,11 +1073,17 @@ function renderSiteDetail() {
     '</dl>' +
     '<div class="btns" style="margin-top:0"><a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(s.addr) + '">Open in Google Maps</a>' +
     '<a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/search?q=' + encodeURIComponent(s.addr) + '">Search the address</a>' +
-    '<button type="button" class="btn small" data-copy="' + esc(location.origin + location.pathname + '#site/' + encodeURIComponent(s.id)) + '">Copy link to this site</button></div>' +
+    '<button type="button" class="btn small" data-copy="' + esc(location.origin + location.pathname + '#site/' + encodeURIComponent(s.id)) + '">Copy link to this site</button>' +
+    '<button type="button" class="btn small' + (S.route.includes(s.id) ? '' : ' primary') + '" id="sd_route">' + (S.route.includes(s.id) ? 'Remove from route' : 'Add to route') + '</button></div>' +
     '<details id="sd_editbox" style="margin-top:10px"><summary style="cursor:pointer;color:var(--accent)">Set or correct the builder and owner</summary>' +
       '<div class="grid2" style="margin-top:8px"><div><label for="se_builder">Builder</label><input class="draft" id="se_builder" type="text" value="' + esc(s.builder) + '"></div>' +
       '<div><label for="se_owner">Owner</label><input class="draft" id="se_owner" type="text" value="' + esc(s.owner) + '"></div></div>' +
       '<div class="btns"><button type="button" class="btn primary" id="se_save">Save</button><span class="sub">Shows on the pin and the site card in the app. A named builder also raises the rating of an addition.</span></div></details></div>' +
+    '<div class="sec"><h3>Desk check</h3><div class="btns" style="margin-top:0">' +
+      (placed(s) ? '<a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=' + s.lat + ',' + s.lon + '">Street View</a><a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=20&center=' + s.lat + ',' + s.lon + '">Satellite</a>' : '') +
+      '<button type="button" class="btn small" data-desk="active"' + (S.desk[s.id] === 'active' ? ' disabled' : '') + '>Looks active</button><button type="button" class="btn small" data-desk="nothing"' + (S.desk[s.id] === 'nothing' ? ' disabled' : '') + '>Nothing yet</button>' +
+      (S.desk[s.id] ? '<button type="button" class="btn small" data-desk="">Clear</button>' : '') + '</div>' +
+      '<div class="sub" style="margin-top:6px">' + (S.desk[s.id] === 'active' ? 'You marked this as looking active, so it shows as a best bet on the phone.' : S.desk[s.id] === 'nothing' ? 'You marked this as nothing yet, so it drops to a long shot for 45 days.' : 'Look before you drive. “Looks active” makes it a best bet on the phone; “Nothing yet” drops it for 45 days. Street and satellite photos can be months old.') + '</div></div>' +
     '<div class="sec"><h3>Research note</h3><textarea class="draft" id="sd_note" aria-label="Research note for this job site" placeholder="What you found online: builder, architect, owner, listing, who to ask for…">' + esc(note) + '</textarea>' +
       '<div class="btns"><button type="button" class="btn primary" id="sd_saveNote">Save note</button><span class="sub">Shows on this site\'s card in the app under “Research notes”.</span></div></div>' +
     (v || s.mine ? '<div class="sec"><h3>Photos</h3><div id="sd_photos"></div></div>' : '') +
@@ -978,6 +1104,81 @@ function renderSiteDetail() {
   });
   if (v || s.mine) { fillPhotos(s.id); loadPhotoList(s.id); }
 }
+
+/* ---------- Builders: everyone named on a permit or met on a visit ---------- */
+const NOT_BUILDER = /^(owner|owner[ -]builder|self|tbd|n\/?a|none|unknown|homeowner|same|same as owner)$/i;
+function builders() {
+  if (S.builders) return S.builders;
+  const m = new Map();
+  const add = (name, site, how) => {
+    name = String(name || '').trim(); if (!name || NOT_BUILDER.test(name)) return;
+    const k = coName(name); if (k.length < 3) return;
+    let b = m.get(k); if (!b) m.set(k, b = {key: k, names: {}, sites: new Map()});
+    b.names[name] = (b.names[name] || 0) + 1;
+    if (!b.sites.has(site.id) || how === 'visit') b.sites.set(site.id, {site, how});
+  };
+  for (const site of S.sites) { for (const part of String(site.builder || '').split(/\s+\/\s+/)) add(part, site, 'permit'); const v = S.visits[site.id]; if (v && v.gc) add(v.gc, site, 'visit'); }
+  const exact = new Map(); for (const l of S.leads) { const c = l._c || (l._c = coName(l.c)); if (c.length >= 3 && !exact.has(c)) exact.set(c, l); }
+  const long = S.leads.filter(l => l._c.length >= 6);
+  S.builders = [...m.values()].map(b => {
+    b.name = Object.entries(b.names).sort((x, y) => y[1] - x[1] || y[0].length - x[0].length)[0][0];
+    b.list = [...b.sites.values()].map(x => x.site).sort((x, y) => String(y.date).localeCompare(String(x.date)));
+    b.met = [...b.sites.values()].some(x => x.how === 'visit');
+    b.competitor = /andersen|marvin|renewal by|window world|kolbe|loewen|pella/i.test(b.name); // a window company, not a builder to sell to
+    b.best = b.list.filter(x => ['hot', 'likely'].includes(rate(x)[0])).length;
+    b.visited = b.list.filter(x => S.visits[x.id]).length;
+    b.towns = [...new Set(b.list.map(x => x.town).filter(Boolean))];
+    b.latest = b.list.map(x => x.date || '').sort().pop() || '';
+    b.lead = exact.get(b.key) || (b.key.length >= 6 ? long.find(l => l._c.startsWith(b.key + ' ') || b.key.startsWith(l._c + ' ')) : null) || null;
+    return b;
+  }).sort((x, y) => y.best - x.best || y.list.length - x.list.length || y.latest.localeCompare(x.latest));
+  return S.builders;
+}
+const BLD_FILTERS = [['new', 'Not in your leads'], ['lead', 'In your leads'], ['met', 'Met on site'], ['off', 'Off-limits'], ['all', 'All']];
+function builderMatches() {
+  const words = $('#bldQ').value.trim().toLowerCase().split(/\s+/).filter(Boolean), f = S.bldFilter;
+  return builders().filter(b => {
+    if (f === 'new' && (b.lead || b.competitor)) return false;
+    if (f === 'lead' && !(b.lead && !offLimits(b.lead))) return false;
+    if (f === 'off' && !(b.lead && offLimits(b.lead))) return false;
+    if (f === 'met' && !b.met) return false;
+    if (!words.length) return true;
+    const h = (Object.keys(b.names).join(' ') + ' ' + b.towns.join(' ')).toLowerCase();
+    return words.every(w => h.includes(w));
+  });
+}
+const bldRow = b => '<button type="button" class="row" data-b="' + esc(b.key) + '" aria-current="' + (S.bldSel === b.key) + '"><b>' + esc(b.name) + '</b><span>' +
+  (b.competitor ? '<span class="tag">Window company</span>' : b.lead ? (offLimits(b.lead) ? '<span class="tag bad">Off-limits</span>' : '<span class="tag good">In your leads</span>') : '<span class="tag blue">Not in leads</span>') + (b.best ? '<span class="tag hot">' + b.best + ' best ' + (b.best === 1 ? 'bet' : 'bets') + '</span>' : '') +
+  esc(b.list.length + (b.list.length === 1 ? ' job site' : ' job sites') + (b.towns.length ? ' · ' + b.towns.slice(0, 3).join(', ') : '')) + '</span></button>';
+function renderBuilders() {
+  if (S.tab !== 'builders') return;
+  $('#bldChips').innerHTML = BLD_FILTERS.map(([k, n]) => '<button type="button" class="chip" data-f="' + k + '" aria-pressed="' + (S.bldFilter === k) + '">' + n + '</button>').join('');
+  const m = builderMatches(); renderBuilders.list = m;
+  $('#bldCount').textContent = m.length.toLocaleString() + (m.length === 1 ? ' builder' : ' builders') + (m.length > 200 ? ' · showing the first 200' : '');
+  $('#bldList').innerHTML = m.length ? m.slice(0, 200).map(bldRow).join('') : '<div class="empty">No builder matches that.</div>';
+  const el = $('#bldDetail'), b = builders().find(x => x.key === S.bldSel);
+  if (!b) return;
+  el.innerHTML = '<div class="pad"><h2>' + esc(b.name) + '</h2><div class="sub">' + esc(b.list.length + (b.list.length === 1 ? ' job site' : ' job sites') + ' · ' + b.visited + ' visited · ' + b.best + ' best ' + (b.best === 1 ? 'bet' : 'bets') + (b.latest ? ' · latest permit ' + b.latest : '')) + '</div>' +
+    (Object.keys(b.names).length > 1 ? '<div class="sub">Also written: ' + esc(Object.keys(b.names).filter(n => n !== b.name).slice(0, 4).join('; ')) + '</div>' : '') +
+    '<div class="btns"><a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/search?q=' + encodeURIComponent(b.name + ' ' + (b.towns[0] || '') + ' NY builder') + '">Search the web</a>' +
+    (b.lead || b.competitor ? '' : '<button type="button" class="btn small primary" id="bld_add">Add as lead</button>') + '<button type="button" class="btn small" id="bld_route">Add their best bets to the route</button></div></div>' +
+    '<div class="sec"><h3>In your leads</h3>' + (b.lead ? leadRow(b.lead) : '<div class="sub">Not yet. Check Salesforce for the account owner before you add or contact them.</div>') + '</div>' +
+    '<div class="sec" style="padding-left:0;padding-right:0;padding-bottom:0"><h3 style="padding:0 16px">Their job sites</h3>' + b.list.map(x => siteRow(x, esc(rate(x)[1]))).join('') + '</div>';
+}
+
+/* ---------- Search everything ---------- */
+function globalSearch() {
+  const q = $('#globalQ').value.trim().toLowerCase(), box = $('#gResults');
+  if (q.length < 2) { box.classList.add('hide'); return; }
+  const words = q.split(/\s+/), digits = q.replace(/\D/g, '');
+  const L1 = S.leads.filter(l => (digits.length >= 7 && l._h.includes(digits)) || words.every(w => l._h.includes(w))).slice(0, 6);
+  const S1 = S.sites.filter(x => { const h = (x.addr + ' ' + x.town + ' ' + x.builder + ' ' + x.owner).toLowerCase(); return words.every(w => h.includes(w)); }).slice(0, 6);
+  const B1 = builders().filter(b => words.every(w => Object.keys(b.names).join(' ').toLowerCase().includes(w))).slice(0, 4);
+  box.innerHTML = (L1.length ? '<h4>Leads</h4>' + L1.map(l => leadRow(l)).join('') : '') + (S1.length ? '<h4>Job sites</h4>' + S1.map(x => siteRow(x)).join('') : '') + (B1.length ? '<h4>Builders</h4>' + B1.map(bldRow).join('') : '') ||
+    '<div class="empty" style="padding:18px">Nothing matches. <button type="button" class="btn small" id="gAdd">Add “' + esc($('#globalQ').value.trim()) + '” as a lead</button></div>';
+  box.classList.remove('hide');
+}
+function openBuilder(k) { S.bldSel = k; const b = builders().find(x => x.key === k); if (b && !builderMatches().includes(b)) { S.bldFilter = 'all'; $('#bldQ').value = ''; } showTab('builders', true); setHash('builder/' + encodeURIComponent(k)); if (window.innerWidth < 861) $('#bldDetail').scrollIntoView({behavior: 'smooth', block: 'start'}); }
 
 /* ---------- Add ---------- */
 function leadDupes(name, extra) {
@@ -1031,7 +1232,7 @@ function renderActivity() {
   if (S.tab !== 'activity') return;
   const applied = new Set(S.backup.applied_ops || []), queued = new Map(S.queue.map(o => [o.id, o])), inbox = new Set((S.inbox.ops || []).map(o => o.id));
   const pend = pendingOps(), held = pend.filter(o => needs(o) > caps()).length, waiting = pend.length - held;
-  $('#actSub').textContent = (waiting ? waiting + ' waiting for your phone. They land as soon as Field Hub is open on the iPhone. ' : '') + (held ? held + ' waiting for the app update (build 50). ' : '') + (!waiting && !held ? 'Everything you sent has reached your phone.' : '');
+  $('#actSub').textContent = (waiting ? waiting + ' waiting for your phone. They land as soon as Field Hub is open on the iPhone. ' : '') + (held ? held + ' waiting for the app update (the newest build in TestFlight). ' : '') + (!waiting && !held ? 'Everything you sent has reached your phone.' : '');
   $('#actList').innerHTML = S.sent.length ? '<table><thead><tr><th>When</th><th>What</th><th>Status</th></tr></thead><tbody>' + S.sent.slice(0, 120).map(a => {
     const q = queued.get(a.id);
     const st = applied.has(a.id) ? '<span class="tag good">On phone ✓</span>' : q ? (needs(q) > caps() ? '<span class="tag wait">Waiting for app update</span>' : '<span class="tag warn">Not sent yet</span>') : inbox.has(a.id) ? '<span class="tag wait">Waiting for phone</span>' : '<span class="tag good">On phone ✓</span>';
@@ -1040,10 +1241,10 @@ function renderActivity() {
   const saved = S.backup.saved_at ? new Date(S.backup.saved_at).toLocaleString() : 'not reported yet';
   $('#phoneInfo').textContent = 'Phone last checked in: ' + saved + (S.backup.app_build ? ' (app build ' + S.backup.app_build + ')' : '') + '. The daily permit search last added sites on ' + (S.feedUpdated || 'an unknown date') + '. ' + Object.keys(S.backup.visits || {}).length + ' visits, ' + S.sites.length.toLocaleString() + ' job sites, ' + S.leads.length.toLocaleString() + ' leads.';
 }
-function renderAll() { renderSync(); renderToday(); renderLeads(); renderPipeline(); renderSites(); renderActivity(); }
+function renderAll() { renderSync(); renderToday(); renderLeads(); renderPipeline(); renderSites(); renderBuilders(); renderActivity(); }
 
 /* ---------- Tabs, links, events ---------- */
-const TABS = ['today', 'leads', 'pipeline', 'sites', 'add', 'activity'];
+const TABS = ['today', 'leads', 'pipeline', 'sites', 'builders', 'add', 'activity'];
 function setHash(h) { try { history.replaceState(null, '', '#' + h); } catch {} }
 function showTab(t, keepHash) {
   S.tab = t;
@@ -1057,6 +1258,7 @@ function openSite(id, filter) { if (filter) S.siteFilter = filter; showTab('site
 function go(where) {
   if (where.startsWith('sites:')) { S.siteFilter = where.slice(6); $('#siteQ').value = ''; $('#siteTown').value = ''; fitted = false; return showTab('sites'); }
   if (where === 'pipeline') return showTab('pipeline');
+  if (where === 'builders') { S.bldFilter = 'met'; return showTab('builders'); }
   if (where === 'visited') { S.siteFilter = 'visited'; fitted = false; return showTab('sites'); }
   S.leadFilter = where; $('#leadQ').value = ''; showTab('leads');
 }
@@ -1068,6 +1270,7 @@ function applyHash() {
   const p = new URLSearchParams(qi < 0 ? '' : h.slice(qi + 1));
   if (name.startsWith('lead/')) { const k = name.slice(5); if (S.leadByK.has(k)) openLead(k); }
   else if (name.startsWith('site/')) { const id = name.slice(5); if (S.siteById.has(id)) openSite(id); }
+  else if (name.startsWith('builder/')) openBuilder(name.slice(8));
   else if (name === 'add') { showTab('add', true); for (const f of ['company', 'contact', 'phone', 'email', 'town', 'note', 'source', 'next', 'date']) if (p.get(f)) $('#al_' + f).value = p.get(f); showLeadDupes(); }
   else if (name === 'site') { showTab('add', true); for (const f of ['addr', 'town', 'builder', 'note']) if (p.get(f)) $('#as_' + f).value = p.get(f); showSiteDupes(); $('#addSite').scrollIntoView(); }
   else if (name.startsWith('q=')) { $('#leadQ').value = name.slice(2); S.leadFilter = 'all'; showTab('leads', true); }
@@ -1084,7 +1287,7 @@ document.addEventListener('click', e => {
 $('#lightbox').addEventListener('click', () => $('#lightbox').classList.add('hide'));
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') $('#lightbox').classList.add('hide');
-  if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) { if (S.tab !== 'sites' && S.tab !== 'leads') showTab('leads'); e.preventDefault(); (S.tab === 'sites' ? $('#siteQ') : $('#leadQ')).focus(); }
+  if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) { e.preventDefault(); $('#globalQ').focus(); }
 });
 for (const id of ['stats', 'dash', 'board']) $('#' + id).addEventListener('click', e => {
   const a = e.target.closest('[data-addgc]');
@@ -1092,6 +1295,27 @@ for (const id of ['stats', 'dash', 'board']) $('#' + id).addEventListener('click
   const g = e.target.closest('[data-go]'); if (g) return go(g.dataset.go);
   const r = e.target.closest('.row[data-k]'); if (r) return openLead(r.dataset.k);
   const s = e.target.closest('.row[data-id]'); if (s) return openSite(s.dataset.id);
+});
+$('#globalQ').addEventListener('input', globalSearch);
+$('#globalQ').addEventListener('focus', globalSearch);
+$('#globalQ').addEventListener('keydown', e => { if (e.key === 'Escape') { $('#gResults').classList.add('hide'); e.target.blur(); } if (e.key === 'Enter') { const r = $('#gResults .row'); if (r) r.click(); } });
+document.addEventListener('click', e => { if (!e.target.closest('.gsearch')) $('#gResults').classList.add('hide'); });
+$('#gResults').addEventListener('click', e => {
+  const hide = () => { $('#gResults').classList.add('hide'); $('#globalQ').value = ''; };
+  if (e.target.id === 'gAdd') { const q = $('#globalQ').value.trim(); hide(); showTab('add'); $('#al_company').value = q; showLeadDupes(); return $('#al_contact').focus(); }
+  const r = e.target.closest('.row'); if (!r) return;
+  hide(); if (r.dataset.k) openLead(r.dataset.k); else if (r.dataset.id) openSite(r.dataset.id); else if (r.dataset.b) openBuilder(r.dataset.b);
+});
+$('#bldQ').addEventListener('input', renderBuilders);
+$('#bldChips').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { S.bldFilter = b.dataset.f; renderBuilders(); } });
+$('#bldList').addEventListener('click', e => { const r = e.target.closest('[data-b]'); if (r) openBuilder(r.dataset.b); });
+$('#bldCsv').addEventListener('click', () => download('field-hub-builders-' + today() + '.csv', csv([['Builder', 'Job sites', 'Best bets', 'Visited', 'Towns', 'Latest permit', 'In your leads', 'Lead status', 'Addresses']].concat((renderBuilders.list || []).map(b => [b.name, b.list.length, b.best, b.visited, b.towns.join('; '), b.latest, b.lead ? b.lead.c : '', b.lead ? (offLimits(b.lead) ? 'Off-limits' : STAGE[stage(b.lead)][0]) : '', b.list.map(x => x.addr.split(',').slice(0, 2).join(',')).join('; ')])))));
+$('#bldDetail').addEventListener('click', e => {
+  const b = builders().find(x => x.key === S.bldSel); if (!b) return;
+  if (e.target.id === 'bld_add') { showTab('add'); $('#al_company').value = b.name; $('#al_town').value = b.towns[0] || ''; $('#al_note').value = 'Named on ' + b.list.length + (b.list.length === 1 ? ' job site: ' : ' job sites: ') + b.list.slice(0, 6).map(x => x.addr.split(',').slice(0, 2).join(',') + ' (' + (x.type || 'permit') + ', ' + (x.date || 'no date') + ')').join('; '); showLeadDupes(); return $('#al_contact').focus(); }
+  if (e.target.id === 'bld_route') { const add = b.list.filter(x => ['hot', 'likely'].includes(rate(x)[0]) && !S.visits[x.id]).map(x => x.id); if (!add.length) return toast('No best bets to add for this builder'); S.siteFilter = 'all'; S.route = [...new Set([...S.route, ...add])]; store.set('fh.route', S.route); toast(add.length + ' added to the route'); return showTab('sites'); }
+  const r = e.target.closest('.row[data-k]'); if (r) return openLead(r.dataset.k);
+  const x = e.target.closest('.row[data-id]'); if (x) return openSite(x.dataset.id);
 });
 $('#leadQ').addEventListener('input', renderLeads);
 $('#leadSort').addEventListener('change', renderLeads);
@@ -1138,6 +1362,9 @@ $('#siteDetail').addEventListener('click', e => {
   const keepAll = sel => { for (const i of $('#siteDetail').querySelectorAll(sel)) i.defaultValue = i.value; };
   const id = e.target.id;
   if (id === 'sd_loadPhotos') return loadPhotos(s.id);
+  if (id === 'sd_route') { if (document.activeElement) document.activeElement.blur(); return setRoute(S.route.includes(s.id) ? S.route.filter(x => x !== s.id) : [...S.route, s.id]); }
+  const dk = e.target.closest('[data-desk]');
+  if (dk) { const v = dk.dataset.desk; done(v === 'active' ? 'Marked as looking active' : v ? 'Marked as nothing yet' : 'Desk check cleared'); return send({type: 'site.desk', site_id: s.id, verdict: v}, (v === 'active' ? 'Looks active' : v ? 'Nothing yet' : 'Desk check cleared') + ': ' + short); }
   if (id === 'sd_saveNote') { const text = $('#sd_note').value.trim(); keepAll('#sd_note'); done('Note saved'); send({type: 'site.note', site_id: s.id, text}, 'Research note: ' + short); }
   if (id === 'se_save') {
     const b = $('#se_builder').value.trim(), o = $('#se_owner').value.trim(), op = {type: 'site.update', site_id: s.id};
@@ -1152,6 +1379,18 @@ $('#siteDetail').addEventListener('click', e => {
   }
   const f = e.target.closest('[data-findlead]');
   if (f) { S.leadFilter = 'all'; $('#leadQ').value = coName(f.dataset.findlead) || f.dataset.findlead; showTab('leads'); }
+});
+$('#siteSort').addEventListener('change', () => { S.near = $('#siteSort').value === 'near' ? S.siteSel : null; if ($('#siteSort').value === 'near' && !placed(S.siteById.get(S.near))) toast('Open a site that is on the map first'); renderSites(); });
+$('#routeCard').addEventListener('click', e => {
+  const t = e.target, id = t.id;
+  const nm = t.closest('.nm'); if (nm) return pickSite(nm.dataset.id);
+  if (t.dataset.rm) return setRoute(S.route.filter(x => x !== t.dataset.rm));
+  if (t.dataset.mv) { const i = Number(t.dataset.i), j = i + Number(t.dataset.mv), ids = routeSites().map(s => s.id); if (j < 0 || j >= ids.length) return; [ids[i], ids[j]] = [ids[j], ids[i]]; return setRoute(ids); }
+  if (id === 'rt_clear') return setRoute([]);
+  if (id === 'rt_short') return shortestOrder();
+  if (id === 'rt_top') return setRoute((renderSites.list || []).slice(0, 8).map(s => s.id));
+  if (id === 'rt_load') return setRoute(((S.backup.route || {}).ids || []).filter(x => S.siteById.has(x)));
+  if (id === 'rt_send') { const ids = routeSites().map(s => s.id), name = ($('#rt_name').value || '').trim() || 'Route from your desk'; S.routeName = name; if (document.activeElement) document.activeElement.blur(); toast('Route sent to your phone'); send({type: 'route.set', name, ids}, name + ': ' + ids.length + (ids.length === 1 ? ' stop' : ' stops') + ' sent to the phone'); }
 });
 for (const id of ['al_company', 'al_phone', 'al_email']) $('#' + id).addEventListener('input', showLeadDupes);
 $('#as_addr').addEventListener('input', showSiteDupes);
