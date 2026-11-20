@@ -9,12 +9,12 @@
 <style>
 :root{
   --bg:#f4f5f7; --panel:#fff; --ink:#14181f; --mute:#5c6675; --line:#dfe3e9; --soft:#eef1f5;
-  --accent:#0b6bcb; --accent-ink:#fff; --good:#1c8a4a; --warn:#b26a00; --bad:#b3261e; --wait:#7a4bc4; --dead:#7b8494;
+  --accent:#0b6bcb; --accent-ink:#fff; --good:#1c8a4a; --warn:#b26a00; --bad:#b3261e; --wait:#7a4bc4; --dead:#7b8494; --hot:#d2451e;
   --r:10px; --shadow:0 1px 2px rgba(15,23,42,.06),0 4px 14px rgba(15,23,42,.05);
 }
 @media (prefers-color-scheme:dark){:root{
   --bg:#0e1116; --panel:#171b22; --ink:#e8ecf2; --mute:#98a2b3; --line:#2a303a; --soft:#1e232c;
-  --accent:#58a6ff; --accent-ink:#06121f; --good:#4cc47a; --warn:#e3a73f; --bad:#ff7b72; --wait:#b79cf0; --dead:#8a93a3;
+  --accent:#58a6ff; --accent-ink:#06121f; --good:#4cc47a; --warn:#e3a73f; --bad:#ff7b72; --wait:#b79cf0; --dead:#8a93a3; --hot:#ff8a5c;
   --shadow:none;
 }}
 *{box-sizing:border-box}
@@ -27,39 +27,47 @@ h1,h2,h3{margin:0;line-height:1.25}
 
 header{position:sticky;top:0;z-index:1000;background:var(--panel);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:8px 16px;flex-wrap:wrap}
 .brand{font-weight:700;font-size:17px;letter-spacing:-.01em;white-space:nowrap}
-nav{display:flex;gap:2px;background:var(--soft);padding:3px;border-radius:9px}
+nav{display:flex;gap:2px;background:var(--soft);padding:3px;border-radius:9px;overflow-x:auto;max-width:100%}
 nav button{border:0;background:none;padding:6px 13px;border-radius:7px;cursor:pointer;color:var(--mute);font-weight:600;white-space:nowrap}
 nav button[aria-selected=true]{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
-.sync{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute)}
+nav button .n{display:inline-block;min-width:18px;padding:0 5px;margin-left:5px;border-radius:9px;background:var(--hot);color:#fff;font-size:11.5px;line-height:18px;text-align:center}
+.sync{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute);border:0;background:none;cursor:pointer;padding:4px 0;text-align:left}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--dead);flex:none}
 .dot.live{background:var(--good)} .dot.wait{background:var(--wait)} .dot.err{background:var(--bad)}
 .banner{background:color-mix(in srgb,var(--warn) 14%,var(--panel));border-bottom:1px solid var(--line);padding:9px 16px;font-size:14px}
 
-main{max-width:1280px;margin:0 auto;padding:14px 16px 60px}
+main{max-width:1320px;margin:0 auto;padding:14px 16px 60px}
 .split{display:grid;grid-template-columns:minmax(300px,400px) 1fr;gap:14px;align-items:start}
 @media (max-width:860px){.split{grid-template-columns:1fr}}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
 .pad{padding:14px 16px}
 .tools{display:flex;flex-direction:column;gap:8px;padding:12px}
-input[type=text],input[type=search],input[type=tel],input[type=email],input[type=password],select,textarea{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.toolrow{display:flex;gap:8px}
+.toolrow select{width:auto;flex:none;max-width:48%}
+input[type=text],input[type=search],input[type=tel],input[type=email],input[type=password],input[type=date],input[type=number],select,textarea{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 textarea{min-height:84px;resize:vertical}
-input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input:focus,select:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 11px;font-size:13px;cursor:pointer;color:var(--mute)}
 .chip[aria-pressed=true]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
-.count{font-size:12.5px;color:var(--mute);padding:0 12px 8px}
-.list{max-height:calc(100vh - 250px);overflow:auto;border-top:1px solid var(--line)}
+.count{font-size:12.5px;color:var(--mute);padding:0 12px 8px;display:flex;justify-content:space-between;gap:8px}
+.count button{border:0;background:none;color:var(--accent);cursor:pointer;padding:0;font-size:12.5px;white-space:nowrap}
+.list{max-height:calc(100vh - 270px);overflow:auto;border-top:1px solid var(--line)}
 @media (max-width:860px){.list{max-height:46vh}}
 .row{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:9px 12px;cursor:pointer}
+.row:last-child{border-bottom:0}
 .row:hover{background:var(--soft)} .row[aria-current=true]{background:color-mix(in srgb,var(--accent) 12%,var(--panel))}
 .row b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row>span{display:block;font-size:13px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tag{display:inline-block;font-size:11.5px;font-weight:600;border-radius:5px;padding:1px 6px;background:var(--soft);color:var(--mute);margin-right:5px;vertical-align:1px}
+.row>span.wrap{white-space:normal}
+.row .nx{color:var(--accent)}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;border-radius:5px;padding:1px 6px;background:var(--soft);color:var(--mute);margin-right:5px;vertical-align:1px;white-space:nowrap}
 .tag.good{background:color-mix(in srgb,var(--good) 16%,var(--panel));color:var(--good)}
 .tag.warn{background:color-mix(in srgb,var(--warn) 18%,var(--panel));color:var(--warn)}
 .tag.bad{background:color-mix(in srgb,var(--bad) 15%,var(--panel));color:var(--bad)}
 .tag.wait{background:color-mix(in srgb,var(--wait) 16%,var(--panel));color:var(--wait)}
 .tag.blue{background:color-mix(in srgb,var(--accent) 15%,var(--panel));color:var(--accent)}
+.tag.hot{background:color-mix(in srgb,var(--hot) 16%,var(--panel));color:var(--hot)}
 .empty{padding:36px 16px;text-align:center;color:var(--mute)}
 
 .detail h2{font-size:20px;letter-spacing:-.01em}
@@ -67,11 +75,11 @@ input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid v
 .kv{display:grid;grid-template-columns:120px 1fr;gap:5px 12px;margin:12px 0;font-size:14.5px}
 .kv dt{color:var(--mute)} .kv dd{margin:0;overflow-wrap:anywhere}
 .sec{border-top:1px solid var(--line);padding:13px 16px}
-.sec h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin-bottom:8px}
+.sec h3,.cardh h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin-bottom:8px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (max-width:560px){.grid2{grid-template-columns:1fr}.kv{grid-template-columns:96px 1fr}}
 label{display:block;font-size:13px;color:var(--mute);margin-bottom:3px}
-.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
 .btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 13px;cursor:pointer;font-weight:600;text-decoration:none;color:var(--ink);display:inline-block}
 .btn:hover{background:var(--soft)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
@@ -81,7 +89,7 @@ label{display:block;font-size:13px;color:var(--mute);margin-bottom:3px}
 .alert.bad{border-color:color-mix(in srgb,var(--bad) 40%,var(--line));background:color-mix(in srgb,var(--bad) 9%,var(--panel))}
 .alert.warn{border-color:color-mix(in srgb,var(--warn) 40%,var(--line));background:color-mix(in srgb,var(--warn) 10%,var(--panel))}
 .hist{list-style:none;margin:0;padding:0;font-size:14px}
-.hist li{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.hist li{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line)}
 .hist li:last-child{border:0} .hist time{color:var(--mute);font-variant-numeric:tabular-nums}
 .pre{white-space:pre-wrap;overflow-wrap:anywhere}
 #map{height:340px;border-radius:var(--r) var(--r) 0 0;z-index:1;background:var(--soft)}
@@ -98,6 +106,41 @@ th{color:var(--mute);font-weight:600;font-size:12px;text-transform:uppercase;let
 #connect{max-width:620px;margin:6vh auto;padding:0 16px}
 #connect ol{padding-left:20px} #connect li{margin:7px 0}
 code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:13px}
+
+/* Today */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.stat{padding:12px 14px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.stat:hover{background:var(--soft)}
+.stat b{display:block;font-size:26px;letter-spacing:-.02em;line-height:1.1}
+.stat span{font-size:13px;color:var(--mute)}
+.stat.hotnum b{color:var(--hot)}
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px;align-items:start}
+@media (max-width:420px){.dash{grid-template-columns:1fr}}
+.cardh{padding:12px 14px 2px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.cardh h3{margin:0}
+.cardh button{border:0;background:none;color:var(--accent);cursor:pointer;font-size:13px;padding:0;white-space:nowrap}
+.cardnote{padding:0 14px 8px;font-size:12.5px;color:var(--mute)}
+.rowflex{display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--line)}
+.rowflex:last-child{border-bottom:0}
+.rowflex .row{border:0;flex:1;min-width:0}
+.rowflex .btn{margin-right:10px;flex:none}
+
+/* Pipeline */
+.board{display:grid;grid-template-columns:repeat(4,minmax(240px,1fr));gap:12px;align-items:start;overflow-x:auto}
+.col h3{padding:11px 12px 4px;font-size:14px;display:flex;justify-content:space-between;gap:8px}
+.col h3 span{color:var(--mute);font-weight:500;white-space:nowrap}
+.col .cardnote{padding:0 12px 8px}
+.col .list{max-height:calc(100vh - 210px)}
+
+/* Photos */
+.photos{display:flex;gap:8px;flex-wrap:wrap}
+.photos img{width:132px;height:100px;object-fit:cover;border-radius:8px;cursor:zoom-in;border:1px solid var(--line);background:var(--soft)}
+.ph{width:132px;height:100px;border-radius:8px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--mute);text-align:center;padding:6px}
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:4000;display:flex;align-items:center;justify-content:center;cursor:zoom-out}
+#lightbox img{max-width:96vw;max-height:94vh;border-radius:6px}
+.inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.inline input[type=date],.inline input[type=number]{width:auto}
+.foot{margin-top:26px;text-align:center;font-size:12px;color:var(--mute)}
 </style>
 </head>
 <body>
@@ -127,29 +170,45 @@ code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:13px}
   <header>
     <div class="brand">Field Hub</div>
     <nav role="tablist" aria-label="Sections">
-      <button role="tab" data-tab="leads" aria-selected="true">Leads</button>
+      <button role="tab" data-tab="today" aria-selected="true">Today<span class="n hide" id="navDue"></span></button>
+      <button role="tab" data-tab="leads" aria-selected="false">Leads</button>
+      <button role="tab" data-tab="pipeline" aria-selected="false">Pipeline</button>
       <button role="tab" data-tab="sites" aria-selected="false">Job sites</button>
       <button role="tab" data-tab="add" aria-selected="false">Add</button>
       <button role="tab" data-tab="activity" aria-selected="false">Activity</button>
     </nav>
-    <div class="sync" title="How fresh the phone's data is"><span id="dot" class="dot"></span><span id="syncText">Loading…</span></div>
+    <button class="sync" id="syncBtn" type="button" title="Click to refresh now"><span id="dot" class="dot"></span><span id="syncText">Loading…</span></button>
   </header>
   <div id="banner" class="banner hide"></div>
 
   <main>
+    <!-- TODAY -->
+    <section id="tab-today">
+      <div class="stats" id="stats"></div>
+      <div class="dash" id="dash"></div>
+    </section>
+
     <!-- LEADS -->
-    <section id="tab-leads">
+    <section id="tab-leads" class="hide">
       <div class="split">
         <div class="card">
           <div class="tools">
-            <input id="leadQ" type="search" placeholder="Search company, person, town, phone or email" aria-label="Search leads" autocomplete="off">
+            <div class="toolrow">
+              <input id="leadQ" type="search" placeholder="Search company, person, town, phone, email or notes" aria-label="Search leads" autocomplete="off">
+              <select id="leadSort" aria-label="Sort leads"><option value="match">Best first</option><option value="recent">Recent activity</option><option value="name">Name A–Z</option></select>
+            </div>
             <div class="chips" id="leadChips"></div>
           </div>
-          <div class="count" id="leadCount"></div>
+          <div class="count"><span id="leadCount"></span><button type="button" id="leadCsv">Download this list</button></div>
           <div class="list" id="leadList"></div>
         </div>
         <div class="card detail" id="leadDetail"><div class="empty">Search for a company to see whether it is already in your list, or pick one on the left.</div></div>
       </div>
+    </section>
+
+    <!-- PIPELINE -->
+    <section id="tab-pipeline" class="hide">
+      <div class="board" id="board"></div>
     </section>
 
     <!-- SITES -->
@@ -157,16 +216,20 @@ code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:13px}
       <div class="split">
         <div class="card">
           <div class="tools">
-            <input id="siteQ" type="search" placeholder="Search address, town or builder" aria-label="Search job sites" autocomplete="off">
+            <div class="toolrow">
+              <input id="siteQ" type="search" placeholder="Search address, town or builder" aria-label="Search job sites" autocomplete="off">
+              <select id="siteTown" aria-label="Town"><option value="">All towns</option></select>
+            </div>
             <div class="chips" id="siteChips"></div>
           </div>
-          <div class="count" id="siteCount"></div>
+          <div class="count"><span id="siteCount"></span><button type="button" id="siteCsv">Download this list</button></div>
           <div class="list" id="siteList"></div>
         </div>
         <div>
           <div class="card" style="margin-bottom:14px">
             <div id="map"></div>
             <div class="legend">
+              <span><i style="background:#d2451e"></i>Best bet</span>
               <span><i style="background:#0b6bcb"></i>To visit</span>
               <span><i style="background:#e0559b"></i>New this week</span>
               <span><i style="background:#1c8a4a"></i>Visited, still live</span>
@@ -196,6 +259,10 @@ code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:13px}
             </div>
             <div style="margin-top:10px"><label for="al_source">Where you found them (link)</label><input id="al_source" name="source" type="text" placeholder="https://"></div>
             <div style="margin-top:10px"><label for="al_note">Note</label><textarea id="al_note" name="note"></textarea></div>
+            <div class="grid2" style="margin-top:10px">
+              <div><label for="al_next">Next step (optional)</label><input id="al_next" name="next" type="text" placeholder="Call and ask for plans"></div>
+              <div><label for="al_date">Follow up on (optional)</label><input id="al_date" name="date" type="date"></div>
+            </div>
             <div class="btns"><button class="btn primary" type="submit">Add lead</button></div>
           </div>
         </form>
@@ -234,14 +301,21 @@ code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:13px}
         <div class="tablewrap" id="actList"></div>
       </div>
       <div class="card pad" style="margin-top:14px">
-        <h2 style="font-size:16px">This browser</h2>
+        <h2 style="font-size:16px">This browser and your data</h2>
         <p class="sub" id="phoneInfo"></p>
-        <div class="btns"><button class="btn" id="refreshNow" type="button">Refresh now</button><button class="btn" id="disconnect" type="button">Disconnect this browser</button></div>
+        <div class="btns">
+          <button class="btn" id="refreshNow" type="button">Refresh now</button>
+          <button class="btn" id="csvVisits" type="button">Download all visits</button>
+          <button class="btn" id="csvWorked" type="button">Download leads you've worked</button>
+          <button class="btn" id="disconnect" type="button">Disconnect this browser</button>
+        </div>
       </div>
     </section>
+    <div class="foot">Field Hub website, version 2</div>
   </main>
 </div>
 <div id="toast" class="toast hide" role="status" aria-live="polite"></div>
+<div id="lightbox" class="hide"><img alt="Job site photo"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
@@ -252,9 +326,12 @@ const PUB = 'https://raw.githubusercontent.com/mkoonmen/jobsites/main/';
 const POLL_MS = 10000;
 const NOSIGNS = 'No Signs of Construction';
 const STAGES = ['', NOSIGNS, 'Cleared lot', 'Foundation', 'Framing', 'Dried in', 'Windows in', 'Siding / finish', 'Finished'];
+const EARLY = ['Cleared lot', 'Foundation', 'Framing', 'Dried in'];
 const OUTCOMES = ['', 'Talked to GC', 'Left card', 'No one there', "Couldn't access", 'Bust', 'Competitor locked in', 'Follow up', 'Not a fit'];
 const WINDOWS = ['Not in yet', 'Pella', 'Andersen', 'Marvin', 'Kolbe', 'Loewen', 'Windsor', 'Other'];
-const STATUS = {'': 'No status', interested: 'Interested', quote: 'Quote out', nurture: 'Nurture', not_interested: 'Not interested', dnc: 'Do not contact'};
+const STATUS = {'': 'No status', interested: 'Interested', quote: 'Quote out', nurture: 'Later', not_interested: 'Not interested', dnc: 'Do not contact', off_limits: 'Off-limits (other rep)'};
+// Kinds of change that need a newer phone app. They wait in this browser until the phone reports it understands them.
+const NEEDS = {'lead.research': 2, 'lead.next': 2, 'lead.update': 2, 'site.update': 2};
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
@@ -263,11 +340,14 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
   del(k) { try { localStorage.removeItem(k); } catch {} }
 };
-const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const today = () => ymd(new Date());
+const plusDays = n => { const d = new Date(); d.setDate(d.getDate() + n); return ymd(d); };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const enc = s => { const b = new TextEncoder().encode(s); let o = ''; for (let i = 0; i < b.length; i += 0x8000) o += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(o); };
 const dec = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g, '')), c => c.charCodeAt(0)));
 const newId = () => 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const money = n => '$' + Math.round(Number(n) || 0).toLocaleString();
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hide'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.add('hide'), 3200); }
 
 let token = store.get('fh.token', '');
@@ -275,7 +355,7 @@ const S = {
   baseSites: [], baseLeads: [], fresh: [], older: [], backup: {}, haveBackup: false, etag: null,
   inbox: {ops: []}, queue: store.get('fh.queue', []), sent: store.get('fh.sent', []),
   sites: [], siteById: new Map(), leads: [], leadByK: new Map(), log: {}, visits: {}, notes: {},
-  leadSel: null, siteSel: null, leadFilter: 'all', siteFilter: 'todo', err: '', lastOk: 0
+  leadSel: null, siteSel: null, leadFilter: 'all', siteFilter: 'best', tab: 'today', err: '', lastOk: 0, feedUpdated: ''
 };
 
 /* ---------- GitHub ---------- */
@@ -290,29 +370,84 @@ async function getJSON(path, fallback) {
   if (!r.ok) throw new Error('GitHub answered ' + r.status + ' for ' + path);
   return r.json();
 }
+// The two big built-in lists rarely change, so keep a copy in this browser and only download them again when they do.
+function idb() { return new Promise((res, rej) => { const r = indexedDB.open('fieldhub', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+async function kvGet(k) { try { const db = await idb(); return await new Promise(res => { const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => res(undefined); }); } catch { return undefined; } }
+async function kvSet(k, v) { try { const db = await idb(); db.transaction('kv', 'readwrite').objectStore('kv').put(v, k); } catch {} }
+async function getStatic(path, fallback) {
+  const c = await kvGet(path);
+  let r;
+  try { r = await gh('/contents/' + path, {raw: true, etag: c && c.etag}); } catch (e) { if (c) return c.data; throw e; }
+  if (r.status === 304 && c) return c.data;
+  if (r.status === 404) return fallback;
+  if (!r.ok) { if (c) return c.data; throw new Error('GitHub answered ' + r.status + ' for ' + path); }
+  const data = await r.json();
+  kvSet(path, {etag: r.headers.get('ETag'), data});
+  return data;
+}
 
-/* ---------- Same ids the phone uses ---------- */
+/* ---------- Same ids and rules the phone uses ---------- */
 const siteKey = a => a.toLowerCase().split(',').slice(0, 2).join(',').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 const CANON = {lane: 'ln', street: 'st', road: 'rd', avenue: 'ave', av: 'ave', drive: 'dr', court: 'ct', place: 'pl', boulevard: 'blvd', highway: 'hwy', turnpike: 'tpke', terrace: 'ter', circle: 'cir', parkway: 'pkwy', path: 'pth', north: 'n', south: 's', east: 'e', west: 'w', point: 'pt', saint: 'st', mount: 'mt'};
 const canon = a => a.toLowerCase().split(',').slice(0, 2).join(' ').replace(/[^a-z0-9 ]+/g, ' ').split(' ').filter(Boolean).map(w => CANON[w] || w).join(' ');
 const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const coName = s => norm(s).replace(/\b(inc|llc|corp|co|company|ltd|the|and|construction|contracting|builders?|building|homes?|custom|group|associates|enterprises|services)\b/g, ' ').replace(/\s+/g, ' ').trim();
-const visitDate = v => v && typeof v.date === 'number' ? new Date((v.date + 978307200) * 1000) : null;
+const appDate = n => typeof n === 'number' ? new Date((n + 978307200) * 1000) : null;
+const visitDate = v => v ? appDate(v.date) : null;
+const fmtDay = d => d ? d.toLocaleDateString(undefined, {month: 'short', day: 'numeric'}) : '';
 const isDead = v => ['Competitor locked in', 'Not a fit', 'Bust'].includes(v.outcome) || v.stage === 'Finished' || (!['', 'Not in yet', 'Pella'].includes(v.windows) && ['Windows in', 'Siding / finish'].includes(v.stage));
-const daysAgo = ymd => { const t = Date.parse(ymd + 'T12:00:00'); return isNaN(t) ? 9999 : Math.floor((Date.now() - t) / 864e5); };
+// Whole calendar days between a yyyy-mm-dd date and today (negative for a date still to come).
+const daysAgo = d => { const t = Date.parse(String(d).slice(0, 10) + 'T00:00:00'); if (isNaN(t)) return 9999; const n = new Date(); n.setHours(0, 0, 0, 0); return Math.round((n - t) / 864e5); };
+const prettyDue = d => { const n = -daysAgo(d); const day = new Date(d + 'T12:00:00'); return n === 0 ? 'today' : n === 1 ? 'tomorrow' : n < 0 ? 'overdue since ' + fmtDay(day) : day.toLocaleDateString(undefined, {weekday: 'short', month: 'short', day: 'numeric'}); };
+const agoDay = d => { const n = daysAgo(d); return n <= 0 ? 'today' : n === 1 ? 'yesterday' : n < 14 ? n + 'd ago' : n < 60 ? Math.floor(n / 7) + 'w ago' : Math.floor(n / 30) + 'mo ago'; };
+const isZoning = s => { const t = (s.type || '').toLowerCase(); return ['bza', 'zba', 'zoning', 'variance', 'hearing', 'planning board', 'arb', 'subdivision'].some(w => t.includes(w)); };
+
+/** How worth a stop a site is, and why. Same rules as the app's pins. */
+function rating(s) {
+  const v = S.visits[s.id];
+  if (v) {
+    if (['Bust', 'Not a fit'].includes(v.outcome)) return ['low', 'You marked it ' + v.outcome.toLowerCase()];
+    if (v.outcome === 'Competitor locked in') return ['low', 'Competitor locked in'];
+    if (v.windows && v.windows !== 'Not in yet') return ['low', v.windows + ' windows already in'];
+    if (v.stage === NOSIGNS) { const r = appDate(v.recheck); if (r && r <= new Date()) return ['maybe', 'Check-back due: see if work started']; return ['low', 'Nothing started yet' + (r ? '. Check back ' + fmtDay(r) : '')]; }
+    if (EARLY.includes(v.stage)) return ['hot', v.stage + ', windows not picked yet'];
+    if (['Siding / finish', 'Finished', 'Windows in'].includes(v.stage)) return ['low', 'Too far along (' + v.stage.toLowerCase() + ')'];
+    return ['maybe', 'Visited ' + fmtDay(visitDate(v))];
+  }
+  const d = (s.date || '').length >= 10 ? daysAgo(s.date) : 120, mo = Math.floor(d / 30), type = (s.type || '').toLowerCase();
+  if (isZoning(s)) {
+    if (d < 180) return ['low', 'Zoning hearing only. These rarely have anything started'];
+    if (d < 540) return ['maybe', 'Zoning approved ' + mo + ' months ago: may be starting'];
+    return ['low', 'Old zoning approval'];
+  }
+  if (!s.isNew && /legaliz|as-built|as built|pool house|accessory|\bgarage\b|\bdeck\b|fence|\bshed\b|\bpool\b/.test(type) && !/addition|alteration|renovat|windows/.test(type)) return ['low', 'Small or already-built job'];
+  if (s.isNew) {
+    if (d < 60) return ['maybe', 'New home, but permits under 2 months old usually show nothing yet'];
+    if (d <= 300) return ['hot', 'New home, permit ' + mo + ' months old: your best window'];
+    if (d <= 450) return ['maybe', 'New home, permit ' + mo + ' months old: may be closed in'];
+    return ['low', 'Permit over 15 months old'];
+  }
+  if (d < 45) return ['low', 'Addition/alteration permit under 6 weeks old'];
+  if (d <= 200) return s.builder ? ['likely', 'Addition with a named builder, permit ' + mo + ' months old'] : ['maybe', 'Addition/alteration, permit ' + mo + ' months old'];
+  return ['low', 'Addition/alteration over 6 months old: usually finished'];
+}
 
 /* ---------- Build what's on screen from the phone's data plus anything still on its way ---------- */
+const caps = () => S.backup.caps || 1;
+const needs = o => o.v || NEEDS[o.type] || 1;
 function pendingOps() {
   const applied = new Set(S.backup.applied_ops || []);
   const seen = new Set(), out = [];
   for (const o of [...(S.inbox.ops || []), ...S.queue]) { if (applied.has(o.id) || seen.has(o.id)) continue; seen.add(o.id); out.push(o); }
   return out.sort((a, b) => a.t - b.t);
 }
+let cacheT = new Map(), cacheR = new Map();
 function derive() {
   const b = S.backup, geo = b.geocache || {}, pend = pendingOps();
+  cacheT = new Map(); cacheR = new Map();
   // Sites
   const mine = (b.custom_sites || []).map(s => ({...s, mine: true}));
-  for (const o of pend) if (o.type === 'site.add') mine.push({lat: o.lat || 0, lon: o.lon || 0, addr: o.addr, town: o.town || '', type: (o.kind || 'Addition / renovation') + ' (added on the website)', builder: o.builder || '', owner: '', date: today(), isNew: false, approx: false, mine: true, pending: true});
+  for (const o of pend) if (o.type === 'site.add') mine.push({lat: o.lat || 0, lon: o.lon || 0, addr: o.addr, town: o.town || '', type: (o.kind || 'Addition / renovation') + ' (added on the website)', builder: o.builder || '', owner: '', date: today(), isNew: /new/i.test(o.kind || ''), approx: false, mine: true, pending: true});
   const seen = new Map(), all = [];
   for (const s of [...mine, ...S.baseSites, ...S.fresh, ...S.older]) {
     if (!s || !s.addr) continue;
@@ -324,9 +459,12 @@ function derive() {
     all.push(t);
   }
   const fixes = b.address_fixes || {}, pins = b.pins || {};
+  const edits = JSON.parse(JSON.stringify(b.site_edits || {}));
+  for (const o of pend) if (o.type === 'site.update') { const e = edits[o.site_id] || (edits[o.site_id] = {}); for (const f of ['builder', 'owner']) if (f in o) { if (o[f]) e[f] = o[f]; else delete e[f]; } }
   for (const s of all) {
     if (fixes[s.id]) s.addr = fixes[s.id];
     const p = pins[s.id]; if (p && p.length === 2) { s.lat = p[0]; s.lon = p[1]; }
+    const e = edits[s.id]; if (e) { s.permitBuilder = s.builder; if (e.builder) s.builder = e.builder; if (e.owner) s.owner = e.owner; s.edited = true; }
   }
   S.visits = {...(b.visits || {})};
   S.notes = {...(b.site_notes || {})};
@@ -341,41 +479,80 @@ function derive() {
   const custom = (b.custom_leads || []).map(l => ({...l, mine: true}));
   const have = new Set(custom.map(l => l.k));
   for (const o of pend) if (o.type === 'lead.add' && !have.has(o.k)) custom.push({k: o.k, c: o.company, t: o.town || '', a: 'Added by you', p: o.phone || '', e: o.email || '', ct: o.contact || '', v: 'Reach out now', b: 'Added on the website', val: '', s: '', n: [o.note, o.source].filter(Boolean).join('\n'), mine: true, pending: true});
-  S.leads = [...custom, ...S.baseLeads];
-  S.leadByK = new Map(S.leads.map(l => [l.k, l]));
   const log = JSON.parse(JSON.stringify(b.leadlog || {}));
   for (const o of pend) {
     if (!o.k || !o.type.startsWith('lead.') || o.type === 'lead.add') continue;
     const g = log[o.k] || (log[o.k] = {touches: [], status: '', note: ''});
     if (o.type === 'lead.note') g.note = o.text || '';
-    if (o.type === 'lead.status') g.status = o.status || '';
+    if (o.type === 'lead.status') { g.status = o.status || ''; if ('amount' in o) g.quoteAmount = o.amount || null; }
     if (o.type === 'lead.touch') (g.touches = g.touches || []).push({d: today(), ch: o.ch, waiting: true});
-    g.waiting = true;
+    if (o.type === 'lead.research') (g.research = g.research || []).push({d: o.d || today(), t: o.text, waiting: true});
+    if (o.type === 'lead.next') { g.next = o.text || null; g.remind = o.date || null; }
+    if (o.type === 'lead.update') { const f = g.fix = {...(g.fix || {})}; for (const [k, v] of Object.entries(o.fields || {})) { if (v) f[k] = v; else delete f[k]; } }
+    g.waiting = true; g.u = new Date(o.t).toISOString();
   }
   S.log = log;
+  S.leads = [...custom, ...S.baseLeads].map(l => {
+    const f = (log[l.k] || {}).fix;
+    if (!f || !Object.keys(f).length) return l;
+    return {...l, c: f.c || l.c, ct: f.ct || l.ct, p: f.p || l.p, e: f.e || l.e, t: f.t || l.t, _h: null, _c: null, corrected: true, orig: l};
+  });
+  S.leadByK = new Map(S.leads.map(l => [l.k, l]));
   for (const l of S.leads) if (!l._h) l._h = [l.c, l.ct, l.t, l.e, l.n, l.b].join(' ').toLowerCase() + ' ' + String(l.p || '').replace(/\D/g, '');
 }
+
+/* ---------- Where a lead stands (same rules as the app) ---------- */
+const BOUNCE = /undeliverable|delivery (delayed|has failed|status)|mail delivery|returned mail|failure notice/i;
+function touches(l) {
+  if (cacheT.has(l.k)) return cacheT.get(l.k);
+  const g = S.log[l.k] || {}, t = [];
+  for (const x of l.tl || []) if (x.length >= 3) { let dir = x[1]; const text = x[3] || ''; if (dir === 'in' && BOUNCE.test(text)) dir = 'bounce'; t.push({d: x[0], dir, ch: x[2], text}); }
+  for (const e of g.touches || []) t.push({d: e.d, dir: 'out', ch: e.ch, text: e.waiting ? 'Logged here (waiting for phone)' : 'Logged'});
+  for (const r of g.results || []) t.push({d: r.d, dir: r.ch === 'Interested' || r.ch === 'Talked' ? 'in' : 'out', ch: 'Call', text: r.ch});
+  t.sort((a, b) => String(b.d).localeCompare(String(a.d)));
+  cacheT.set(l.k, t); return t;
+}
+function stage(l) {
+  const st = (S.log[l.k] || {}).status || '', t = touches(l);
+  if (l.s === 'removed' || ['not_interested', 'dnc', 'off_limits'].includes(st)) return 'closed';
+  if (l.s === 'working' || st === 'quote') return 'working';
+  if (t.some(x => x.dir === 'in' || x.ch === 'Text') || l.warm === true || st === 'interested') return 'replied';
+  if (!t.length) return 'cold';
+  return new Set(t.filter(x => x.dir === 'out').map(x => x.d)).size >= 2 ? 'followed' : 'once';
+}
+function isDue(l) {
+  const sg = stage(l), st = (S.log[l.k] || {}).status || '', last = touches(l)[0];
+  return (sg === 'once' || sg === 'followed') && !!last && st !== 'nurture' && !(l.v === 'Nurture' && !st) && last.dir !== 'bounce' && daysAgo(last.d) >= 5;
+}
+const STAGE = {closed: ['Closed', ''], working: ['In progress', 'warn'], replied: ['Wrote back', 'good'], cold: ['Never contacted', ''], once: ['Contacted once', 'blue'], followed: ['Followed up', 'blue']};
+const offLimits = l => l.s === 'removed' || (S.log[l.k] || {}).status === 'off_limits';
+// A note that starts with a date ("2026-11-19 — …") tells us when it was written, even from an app build that doesn't stamp changes.
+const noteDate = g => { const m = /^\s*(\d{4}-\d{2}-\d{2})\b/.exec((g && g.note) || ''); return m ? m[1] : ''; };
+const lastActive = l => { const g = S.log[l.k] || {}; const a = [(touches(l)[0] || {}).d || '', (g.u || '').slice(0, 10), ((g.research || []).slice(-1)[0] || {}).d || '', noteDate(g)]; return a.sort().pop(); };
+const freshResearch = g => !!g && ((g.research || []).some(x => daysAgo(x.d) <= 7) || (g.u && daysAgo(g.u) <= 7 && !!(g.note || g.next)) || (noteDate(g) && daysAgo(noteDate(g)) <= 7));
+const quoteValue = l => { const g = S.log[l.k] || {}; return Number(g.quoteAmount) || Number(l.val) || 0; };
 
 /* ---------- Sending changes to the phone ---------- */
 let flushing = false;
 function send(op, label) {
-  op.id = newId(); op.t = Date.now();
+  op.id = newId(); op.t = Date.now(); if (!op.v && NEEDS[op.type]) op.v = NEEDS[op.type];
   S.queue.push(op); store.set('fh.queue', S.queue);
-  S.sent.unshift({id: op.id, t: op.t, label}); S.sent = S.sent.slice(0, 250); store.set('fh.sent', S.sent);
+  S.sent.unshift({id: op.id, t: op.t, label, v: op.v || 1}); S.sent = S.sent.slice(0, 300); store.set('fh.sent', S.sent);
   derive(); renderAll(); flush();
 }
 async function flush() {
-  if (flushing || !S.queue.length) return;
+  if (flushing || !S.queue.some(o => needs(o) <= caps())) return;
   flushing = true; renderSync();
   try {
-    for (let tries = 0; tries < 6 && S.queue.length; tries++) {
+    for (let tries = 0; tries < 6; tries++) {
+      const batch = S.queue.filter(o => needs(o) <= caps());
+      if (!batch.length) break;
       const r = await gh('/contents/inbox.json');
       let sha, box = {ops: []};
       if (r.status === 200) { const j = await r.json(); sha = j.sha; try { box = JSON.parse(dec(j.content)) || {ops: []}; } catch { box = {ops: []}; } }
       else if (r.status !== 404) throw new Error('GitHub answered ' + r.status);
       const applied = new Set(S.backup.applied_ops || []), now = Date.now();
       box.ops = (box.ops || []).filter(o => !(applied.has(o.id) && now - o.t > 2 * 864e5) && now - o.t < 45 * 864e5);
-      const batch = S.queue.slice();
       for (const o of batch) if (!box.ops.some(x => x.id === o.id)) box.ops.push(o);
       const put = await gh('/contents/inbox.json', {method: 'PUT', body: {message: 'Website: ' + batch.length + (batch.length === 1 ? ' change' : ' changes'), content: enc(JSON.stringify(box, null, 1)), ...(sha ? {sha} : {})}});
       if (put.ok) { const ids = new Set(batch.map(o => o.id)); S.queue = S.queue.filter(o => !ids.has(o.id)); store.set('fh.queue', S.queue); S.inbox = box; S.err = ''; break; }
@@ -385,7 +562,7 @@ async function flush() {
     }
   } catch (e) { S.err = navigator.onLine === false ? 'Offline. Changes are saved here and will send when you are back online.' : String(e.message || e); }
   flushing = false;
-  if (S.queue.length) setTimeout(flush, 5000);
+  if (S.queue.some(o => needs(o) <= caps())) setTimeout(flush, 5000);
   derive(); renderAll();
 }
 
@@ -397,20 +574,21 @@ async function pollBackup(force) {
     if (r.status === 401) { S.err = 'GitHub no longer accepts this token. Disconnect on the Activity tab and connect again.'; renderSync(); return false; }
     if (!r.ok) throw new Error('GitHub answered ' + r.status);
     S.etag = r.headers.get('ETag'); S.backup = await r.json(); S.haveBackup = true; S.lastOk = Date.now(); if (!S.queue.length) S.err = '';
-    derive(); renderAll(); return true;
+    derive(); renderAll(); flush(); return true;
   } catch (e) { S.err = navigator.onLine === false ? 'Offline.' : 'Could not reach GitHub. Trying again.'; renderSync(); return false; }
 }
 async function loadAll() {
   $('#syncText').textContent = 'Loading your data…';
   const pub = f => fetch(PUB + f, {cache: 'no-store'}).then(r => r.ok ? r.json() : {sites: []}).catch(() => ({sites: []}));
   const [sites, leads, fresh, older, inbox] = await Promise.all([
-    getJSON('web/sites.json', []), getJSON('web/leads.json', {leads: []}), pub('new-permits.json'), pub('all-permits.json'), getJSON('inbox.json', {ops: []})
+    getStatic('web/sites.json', []), getStatic('web/leads.json', {leads: []}), pub('new-permits.json'), pub('all-permits.json'), getJSON('inbox.json', {ops: []})
   ]);
   S.baseSites = sites; S.baseLeads = leads.leads || []; S.fresh = fresh.sites || []; S.older = older.sites || []; S.inbox = inbox && inbox.ops ? inbox : {ops: []};
   S.feedUpdated = fresh.updated || '';
   await pollBackup(true);
   derive(); renderAll(); applyHash(); flush();
   setInterval(() => { if (!document.hidden) pollBackup(); }, POLL_MS);
+  setInterval(renderSync, 30000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { pollBackup(); flush(); } });
   window.addEventListener('online', () => { pollBackup(); flush(); });
 }
@@ -418,90 +596,42 @@ async function loadAll() {
 /* ---------- Header ---------- */
 function ago(d) { const s = Math.max(0, (Date.now() - d) / 1000); if (s < 45) return 'just now'; if (s < 3600) return Math.round(s / 60) + ' min ago'; if (s < 86400) return Math.round(s / 3600) + ' hr ago'; return Math.round(s / 86400) + ' days ago'; }
 function renderSync() {
-  const waiting = pendingOps().length, dot = $('#dot'), saved = S.backup.saved_at ? Date.parse(S.backup.saved_at) : 0;
+  const pend = pendingOps(), held = pend.filter(o => needs(o) > caps()).length, waiting = pend.length - held;
+  const dot = $('#dot'), saved = S.backup.saved_at ? Date.parse(S.backup.saved_at) : 0;
   let text;
   if (S.err) { dot.className = 'dot err'; text = S.err; }
   else if (flushing) { dot.className = 'dot wait'; text = 'Sending…'; }
   else if (waiting) { dot.className = 'dot wait'; text = waiting + (waiting === 1 ? ' change' : ' changes') + ' waiting for your phone'; }
-  else { dot.className = 'dot live'; text = saved ? 'Up to date · phone last checked in ' + ago(saved) : 'Connected'; }
+  else if (held) { dot.className = 'dot wait'; text = held + (held === 1 ? ' change' : ' changes') + ' waiting for the app update'; }
+  else { dot.className = 'dot live'; text = saved ? 'Up to date · phone checked in ' + ago(saved) : 'Connected'; }
   $('#syncText').textContent = text;
-  const ban = $('#banner'), old = S.haveBackup && !('applied_ops' in S.backup);
-  ban.classList.toggle('hide', !old);
-  if (old) ban.textContent = 'Your phone is on an older version of the app. Update Field Hub in TestFlight (build 49 or later) and open it once; until then, what you add here waits in line and what you log on the phone shows up here only after its regular sync.';
+  const ban = $('#banner'), old = S.haveBackup && !('applied_ops' in S.backup), behind = S.haveBackup && !old && caps() < 2;
+  ban.classList.toggle('hide', !(old || behind));
+  if (old) ban.textContent = 'Your phone is on an older version of the app. Update Field Hub in TestFlight and open it once; until then, what you add here waits in line.';
+  else if (behind) ban.textContent = 'Update Field Hub on your phone to build 50 (TestFlight) to get follow-up dates, research log entries and corrections from this site. Until then those wait here; leads, job sites, notes and logged contact still go through.';
 }
 
-/* ---------- Leads ---------- */
-const LEAD_FILTERS = [['all', 'All'], ['now', 'Reach out now'], ['progress', 'In progress'], ['touched', 'You logged'], ['mine', 'You added'], ['removed', 'Off-limits']];
+/* ---------- Shared bits ---------- */
 function leadBadge(l) {
   const g = S.log[l.k] || {};
   if (l.pending) return '<span class="tag wait">Waiting for phone</span>';
-  if (l.s === 'removed') return '<span class="tag bad">Off-limits</span>';
+  if (offLimits(l)) return '<span class="tag bad">Off-limits</span>';
+  if (g.remind && g.remind <= today()) return '<span class="tag hot">Due ' + esc(prettyDue(g.remind)) + '</span>';
   if (g.status) return '<span class="tag ' + (g.status === 'dnc' || g.status === 'not_interested' ? 'bad' : 'good') + '">' + esc(STATUS[g.status] || g.status) + '</span>';
+  const sg = stage(l);
+  if (sg === 'replied') return '<span class="tag good">Wrote back</span>';
+  if (isDue(l)) return '<span class="tag hot">Follow up</span>';
   if (l.mine) return '<span class="tag blue">You added</span>';
   if (l.v) return '<span class="tag' + (l.v === 'Reach out now' ? ' blue' : '') + '">' + esc(l.v) + '</span>';
   return '';
 }
-function leadMatches() {
-  const q = $('#leadQ').value.trim().toLowerCase(), words = q.split(/\s+/).filter(Boolean), digits = q.replace(/\D/g, '');
-  const f = S.leadFilter;
-  return S.leads.filter(l => {
-    const g = S.log[l.k];
-    if (f === 'now' && !(l.v === 'Reach out now' && l.s !== 'removed')) return false;
-    if (f === 'progress' && !(l.v === 'In progress' || l.s === 'working')) return false;
-    if (f === 'touched' && !(g && ((g.touches || []).length || g.status || g.note))) return false;
-    if (f === 'mine' && !l.mine) return false;
-    if (f === 'removed' && l.s !== 'removed') return false;
-    if (!words.length) return true;
-    if (digits.length >= 7 && l._h.includes(digits)) return true;
-    return words.every(w => l._h.includes(w));
-  });
+function leadRow(l, extra) {
+  const g = S.log[l.k] || {};
+  const line2 = extra != null ? extra : esc([l.ct, (l.t || '').split(' / ')[0]].filter(Boolean).join(' · '));
+  return '<button type="button" class="row" data-k="' + esc(l.k) + '" aria-current="' + (S.leadSel === l.k) + '"><b>' + esc(l.c) + '</b><span>' + leadBadge(l) + line2 + '</span>' +
+    (g.next ? '<span class="nx wrap">Next: ' + esc(g.next) + (g.remind ? ' · ' + esc(prettyDue(g.remind)) : '') + '</span>' : '') + '</button>';
 }
-function renderLeads() {
-  $('#leadChips').innerHTML = LEAD_FILTERS.map(([k, n]) => '<button type="button" class="chip" data-f="' + k + '" aria-pressed="' + (S.leadFilter === k) + '">' + n + '</button>').join('');
-  const m = leadMatches(), show = m.slice(0, 120);
-  $('#leadCount').textContent = m.length === S.leads.length ? S.leads.length.toLocaleString() + ' leads' : m.length.toLocaleString() + ' of ' + S.leads.length.toLocaleString() + (m.length > show.length ? ' · showing the first ' + show.length : '');
-  $('#leadList').innerHTML = show.length ? show.map(l =>
-    '<button type="button" class="row" data-k="' + esc(l.k) + '" aria-current="' + (S.leadSel === l.k) + '"><b>' + esc(l.c) + '</b><span>' + leadBadge(l) + esc([l.ct, (l.t || '').split(' / ')[0]].filter(Boolean).join(' · ')) + '</span></button>').join('')
-    : '<div class="empty">No lead matches that.<br><button type="button" class="btn small" id="addFromSearch" style="margin-top:10px">Add “' + esc($('#leadQ').value.trim()) + '” as a new lead</button></div>';
-  renderLeadDetail();
-}
-function renderLeadDetail() {
-  const el = $('#leadDetail'), l = S.leadByK.get(S.leadSel);
-  if (!l) { if (S.leadSel) el.innerHTML = '<div class="empty">That lead is no longer in the list.</div>'; return; }
-  if (el.dataset.k === l.k && el.contains(document.activeElement) && ['TEXTAREA', 'INPUT', 'SELECT'].includes(document.activeElement.tagName)) return; // don't yank the form while typing
-  const g = S.log[l.k] || {touches: [], status: '', note: ''};
-  const phones = String(l.p || '').match(/\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g) || [];
-  const emails = String(l.e || '').match(/[^\s,;]+@[^\s,;]+\.[A-Za-z]{2,}/g) || [];
-  const hist = [];
-  for (const t of g.touches || []) hist.push({d: t.d, who: 'You', text: t.ch + (t.waiting ? ' (waiting for phone)' : '')});
-  for (const r of g.results || []) hist.push({d: r.d, who: 'You', text: r.ch});
-  for (const t of l.tl || []) hist.push({d: t[0], who: t[1] === 'in' ? 'Them' : t[1] === 'out' ? 'You' : t[1], text: [t[2], t[3]].filter(Boolean).join(': ')});
-  hist.sort((a, b) => String(b.d).localeCompare(String(a.d)));
-  const search = encodeURIComponent(l.c + ' ' + (l.t || '').split(' / ')[0] + ' NY');
-  el.dataset.k = l.k;
-  el.innerHTML =
-    '<div class="pad"><h2>' + esc(l.c) + '</h2><div class="sub">' + leadBadge(l) + esc([l.a, l.b].filter(Boolean).join(' · ')) + '</div>' +
-    (l.s === 'removed' ? '<div class="alert bad"><b>Off-limits.</b> ' + esc(l.w || 'Removed from your list.') + '</div>' : '') +
-    (l.sf ? '<div class="alert' + (/another rep|other rep|not yours|owned by/i.test(l.sf) ? ' warn' : '') + '"><b>Salesforce:</b> ' + esc(l.sf) + '</div>' : '') +
-    '<dl class="kv">' +
-      (l.ct ? '<dt>Contact</dt><dd>' + esc(l.ct) + '</dd>' : '') +
-      (phones.length ? '<dt>Phone</dt><dd>' + phones.map(p => '<a href="tel:' + esc(p.replace(/\D/g, '')) + '">' + esc(p) + '</a>').join(', ') + '</dd>' : (l.p ? '<dt>Phone</dt><dd>' + esc(l.p) + '</dd>' : '')) +
-      (emails.length ? '<dt>Email</dt><dd>' + emails.map(e => esc(e)).join(', ') + '</dd>' : '') +
-      (l.t ? '<dt>Town</dt><dd>' + esc(l.t) + '</dd>' : '') +
-      (l.val ? '<dt>Open quote</dt><dd>$' + esc(Number(l.val).toLocaleString(undefined, {maximumFractionDigits: 0})) + '</dd>' : '') +
-      (l.d ? '<dt>Detail</dt><dd>' + esc(l.d) + '</dd>' : '') +
-      (l.nx ? '<dt>Next step</dt><dd>' + esc(l.nx) + '</dd>' : '') +
-      (l.n ? '<dt>On file</dt><dd class="pre">' + esc(l.n) + '</dd>' : '') +
-    '</dl>' +
-    '<div class="btns" style="margin-top:0"><a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/search?q=' + search + '">Search the web</a></div></div>' +
-    '<div class="sec"><h3>Log it</h3><div class="btns" style="margin-top:0">' + ['Call', 'Email', 'Text', 'Visit'].map(c => '<button type="button" class="btn small" data-touch="' + c + '">' + c + '</button>').join('') + '</div>' +
-      '<div style="margin-top:10px;max-width:260px"><label for="ld_status">Status</label><select id="ld_status">' + Object.entries(STATUS).map(([k, n]) => '<option value="' + k + '"' + (g.status === k ? ' selected' : '') + '>' + n + '</option>').join('') + '</select></div></div>' +
-    '<div class="sec"><h3>Your note</h3><textarea id="ld_note" aria-label="Your note on this lead">' + esc(g.note || '') + '</textarea><div class="btns"><button type="button" class="btn primary" id="ld_save">Save note</button></div></div>' +
-    '<div class="sec"><h3>History</h3>' + (hist.length ? '<ul class="hist">' + hist.slice(0, 40).map(h => '<li><time>' + esc(h.d) + '</time><span><b>' + esc(h.who) + '</b> ' + esc(h.text) + '</span></li>').join('') + '</ul>' : '<div class="sub">Nothing logged yet.</div>') + '</div>';
-}
-
-/* ---------- Job sites ---------- */
-const SITE_FILTERS = [['todo', 'To visit'], ['new', 'New this week'], ['visited', 'Visited'], ['mine', 'You added'], ['all', 'All']];
+const RATE = {hot: ['Best bet', 'hot'], likely: ['Likely', 'warn'], maybe: ['Maybe', ''], low: ['Long shot', '']};
 function siteState(s) {
   const v = S.visits[s.id];
   if (s.pending) return 'pending';
@@ -510,23 +640,230 @@ function siteState(s) {
   if (v.stage === NOSIGNS) return 'nosigns';
   return 'live';
 }
+const rate = s => { if (!cacheR.has(s.id)) cacheR.set(s.id, rating(s)); return cacheR.get(s.id); };
 const STATE = {pending: ['Waiting for phone', 'wait', '#7a4bc4'], new: ['New this week', 'blue', '#e0559b'], todo: ['To visit', '', '#0b6bcb'], dead: ['Done / not a fit', '', '#7b8494'], nosigns: ['No signs yet', 'warn', '#d08a00'], live: ['Visited', 'good', '#1c8a4a']};
+function siteRow(s, extra) {
+  const st = STATE[siteState(s)], r = rate(s);
+  const tag = !S.visits[s.id] && !s.pending && (r[0] === 'hot' || r[0] === 'likely') ? '<span class="tag ' + RATE[r[0]][1] + '">' + RATE[r[0]][0] + '</span>' : '<span class="tag ' + st[1] + '">' + st[0] + '</span>';
+  return '<button type="button" class="row" data-id="' + esc(s.id) + '" aria-current="' + (S.siteSel === s.id) + '"><b>' + esc(s.addr.split(',').slice(0, 2).join(',')) + '</b><span>' + tag + (extra != null ? extra : esc(s.builder || s.type || '')) + '</span></button>';
+}
+function csv(rows) { return rows.map(r => r.map(x => { x = String(x ?? ''); return /[",\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; }).join(',')).join('\n'); }
+function download(name, text) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], {type: 'text/csv'})); a.download = name; document.body.appendChild(a); a.click(); a.remove(); toast('Downloaded ' + name); }
+const leadCsvRows = list => [['Company', 'Contact', 'Phone', 'Email', 'Town', 'Where it stands', 'Status', 'Next step', 'Follow up on', 'Last activity', 'Open quote', 'Your note']].concat(list.map(l => { const g = S.log[l.k] || {}; return [l.c, l.ct, l.p, l.e, l.t, offLimits(l) ? 'Off-limits' : STAGE[stage(l)][0], STATUS[g.status || ''] || '', g.next || '', g.remind || '', lastActive(l), quoteValue(l) || '', g.note || '']; }));
+const siteCsvRows = list => [['Address', 'Town', 'Permit', 'Permit date', 'Builder', 'Owner', 'Rating', 'Why', 'Visited', 'Stage', 'Outcome', 'Windows', 'Builder on site', 'Contact', 'Visit notes', 'Research note']].concat(list.map(s => { const v = S.visits[s.id] || {}, r = rate(s), d = visitDate(S.visits[s.id]); return [s.addr, s.town, s.type, s.date, s.builder, s.owner, RATE[r[0]][0], r[1], d ? ymd(d) : '', v.stage || '', v.outcome || '', v.windows || '', v.gc || '', v.contact || '', v.notes || '', S.notes[s.id] || '']; }));
+/** Keeps what you were typing, and which sections were open, when a card redraws under you. */
+function withDrafts(el, sameCard, draw) {
+  const drafts = {};
+  if (sameCard) for (const i of el.querySelectorAll('.draft')) if (i.id && i.value !== i.defaultValue) drafts[i.id] = i.value;
+  const open = sameCard ? [...el.querySelectorAll('details[open]')].map(d => d.id) : [];
+  draw();
+  for (const [id, v] of Object.entries(drafts)) { const i = el.querySelector('#' + id); if (i) i.value = v; }
+  for (const id of open) { const d = id && el.querySelector('#' + id); if (d) d.open = true; }
+}
+const typing = el => el.contains(document.activeElement) && ['TEXTAREA', 'INPUT', 'SELECT'].includes(document.activeElement.tagName);
+
+/* ---------- Today ---------- */
+function spottedBuilders() {
+  const out = [], seen = new Set();
+  let keys = null;
+  for (const s of S.sites) {
+    const v = S.visits[s.id]; if (!v || !v.gc || v.outcome === 'Bust') continue;
+    const k = coName(v.gc); if (k.length < 4 || seen.has(k)) continue; seen.add(k);
+    if (!keys) keys = S.leads.map(l => l._c || (l._c = coName(l.c))).filter(x => x.length >= 4);
+    if (keys.some(x => x === k || x.startsWith(k) || k.startsWith(x))) continue;
+    out.push({site: s, name: v.gc, contact: v.contact || ''});
+  }
+  return out;
+}
+function renderToday() {
+  if (S.tab !== 'today') return;
+  const t = today(), open = S.leads.filter(l => stage(l) !== 'closed');
+  const remind = l => (S.log[l.k] || {}).remind || '';
+  const dueNow = S.leads.filter(l => remind(l) && remind(l) <= t && !offLimits(l)).sort((a, b) => remind(a).localeCompare(remind(b)));
+  const soon = S.leads.filter(l => remind(l) > t && remind(l) <= plusDays(7)).sort((a, b) => remind(a).localeCompare(remind(b)));
+  const replied = open.filter(l => stage(l) === 'replied').sort((a, b) => lastActive(b).localeCompare(lastActive(a)));
+  const follow = open.filter(isDue).sort((a, b) => (touches(a)[0].d).localeCompare(touches(b)[0].d));
+  const quotes = open.filter(l => (S.log[l.k] || {}).status === 'quote' || (l.s === 'working' && Number(l.val) > 0)).sort((a, b) => quoteValue(b) - quoteValue(a));
+  const research = S.leads.filter(l => freshResearch(S.log[l.k])).sort((a, b) => lastActive(b).localeCompare(lastActive(a)));
+  const fresh = S.sites.filter(s => siteState(s) === 'new').sort((a, b) => String(b.firstSeen).localeCompare(String(a.firstSeen)));
+  const best = S.sites.filter(s => !S.visits[s.id] && rate(s)[0] === 'hot').sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  const back = S.sites.filter(isGoBack);
+  const spotted = spottedBuilders();
+  const monday = (() => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); d.setHours(0, 0, 0, 0); return d; })();
+  const visitsWeek = Object.values(S.visits).filter(v => { const d = visitDate(v); return d && d >= monday; }).length;
+  const touchesWeek = Object.values(S.log).reduce((n, g) => n + (g.touches || []).filter(x => x.d >= ymd(monday)).length, 0);
+  const quoteTotal = quotes.reduce((n, l) => n + quoteValue(l), 0);
+  const nav = $('#navDue'); nav.textContent = dueNow.length; nav.classList.toggle('hide', !dueNow.length);
+
+  $('#stats').innerHTML = [
+    [dueNow.length, 'next steps due', 'due', dueNow.length ? ' hotnum' : ''], [replied.length, 'wrote back', 'replied', ''], [follow.length, 'need a follow-up', 'followup', ''],
+    [money(quoteTotal), 'in open quotes', 'pipeline', ''], [visitsWeek, 'site visits this week', 'visited', ''], [touchesWeek, 'calls and emails logged this week', 'touched', '']
+  ].map(([n, label, to, cls]) => '<button type="button" class="card stat' + cls + '" data-go="' + to + '"><b>' + esc(n) + '</b><span>' + label + '</span></button>').join('');
+
+  const card = (title, note, rows, more, n) => !rows.length ? '' : '<div class="card"><div class="cardh"><h3>' + title + ' (' + n + ')</h3>' + (more ? '<button type="button" data-go="' + more + '">See all</button>' : '') + '</div><div class="cardnote">' + note + '</div><div>' + rows.join('') + '</div></div>';
+  const cards = [
+    card('Next steps due', 'Follow-ups you or your research set for today or earlier.', dueNow.slice(0, 12).map(l => leadRow(l)), 'due', dueNow.length),
+    card('They wrote back', 'Answer these first.', replied.slice(0, 8).map(l => leadRow(l, esc(((touches(l).find(x => x.dir === 'in') || touches(l)[0] || {}).text || '').slice(0, 90)))), 'replied', replied.length),
+    card('From your research', 'Leads with notes or research added in the last 7 days.', research.slice(0, 8).map(l => { const g = S.log[l.k], last = (g.research || []).slice(-1)[0]; return leadRow(l, esc(((last && last.t) || g.note || '').split('\n')[0].slice(0, 110))); }), 'updated', research.length),
+    card('Follow up', 'Contacted, no answer in 5 or more days. Oldest first.', follow.slice(0, 10).map(l => leadRow(l, esc('Last contact ' + agoDay(touches(l)[0].d)))), 'followup', follow.length),
+    card('Coming up this week', 'Follow-ups set for the next 7 days.', soon.slice(0, 8).map(l => leadRow(l)), null, soon.length),
+    card('Open quotes', money(quoteTotal) + ' out. Biggest first.', quotes.slice(0, 8).map(l => leadRow(l, esc(money(quoteValue(l)) + (l.d ? ' · ' + l.d : '')))), 'pipeline', quotes.length),
+    card('New permits this week', 'Found by the daily 6 AM search.' + (S.feedUpdated ? ' It last added sites on ' + esc(S.feedUpdated) + '.' : ''), fresh.slice(0, 8).map(s => siteRow(s)), 'sites:new', fresh.length),
+    card('Best bets to visit', 'New homes two to ten months after the permit, not visited yet.', best.slice(0, 8).map(s => siteRow(s, esc(rate(s)[1]))), 'sites:best', best.length),
+    card('Go back to', 'Check-back dates that have come up, follow-ups, and live sites with windows still open.', back.slice(0, 8).map(s => siteRow(s, esc(rate(s)[1]))), 'sites:back', back.length),
+    card('Builders you met, not in your leads', 'Named on your site visits.', spotted.slice(0, 8).map(x => '<div class="rowflex">' + siteRow(x.site, esc(x.name + (x.contact ? ' · ' + x.contact : ''))) + '<button type="button" class="btn small" data-addgc="' + esc(x.site.id) + '">Add as lead</button></div>'), null, spotted.length)
+  ].filter(Boolean);
+  $('#dash').innerHTML = cards.join('') || '<div class="card empty">Nothing needs you right now.</div>';
+}
+
+/* ---------- Leads ---------- */
+const LEAD_FILTERS = [['all', 'All'], ['due', 'Next step due'], ['replied', 'Wrote back'], ['followup', 'Follow up'], ['now', 'Reach out now'], ['progress', 'In progress'], ['updated', 'Updated this week'], ['touched', 'You logged'], ['mine', 'You added'], ['removed', 'Off-limits']];
+function leadMatches() {
+  const q = $('#leadQ').value.trim().toLowerCase(), words = q.split(/\s+/).filter(Boolean), digits = q.replace(/\D/g, '');
+  const f = S.leadFilter, t = today();
+  const out = S.leads.filter(l => {
+    const g = S.log[l.k];
+    if (f === 'now' && !(l.v === 'Reach out now' && !offLimits(l) && stage(l) === 'cold')) return false;
+    if (f === 'progress' && stage(l) !== 'working') return false;
+    if (f === 'touched' && !(g && ((g.touches || []).length || g.status || g.note || (g.research || []).length || g.next))) return false;
+    if (f === 'mine' && !l.mine) return false;
+    if (f === 'removed' && !offLimits(l)) return false;
+    if (f === 'due' && !(g && g.remind && g.remind <= t)) return false;
+    if (f === 'replied' && stage(l) !== 'replied') return false;
+    if (f === 'followup' && !isDue(l)) return false;
+    if (f === 'updated' && !(freshResearch(g) || (g && g.u && daysAgo(g.u) <= 7))) return false;
+    if (!words.length) return true;
+    if (digits.length >= 7 && l._h.includes(digits)) return true;
+    const extra = g ? ((g.note || '') + ' ' + (g.next || '') + ' ' + (g.research || []).map(x => x.t).join(' ')).toLowerCase() : '';
+    return words.every(w => l._h.includes(w) || extra.includes(w));
+  });
+  const sort = $('#leadSort').value;
+  if (sort === 'name') out.sort((a, b) => a.c.localeCompare(b.c));
+  else if (sort === 'recent' || ['updated', 'touched', 'replied'].includes(f)) out.sort((a, b) => lastActive(b).localeCompare(lastActive(a)));
+  else if (f === 'due') out.sort((a, b) => S.log[a.k].remind.localeCompare(S.log[b.k].remind));
+  else if (words.length) { const n = coName(q) || q, rank = l => l.c.toLowerCase().startsWith(q) ? 0 : (l._c || (l._c = coName(l.c))).includes(n) ? 1 : 2; out.sort((a, b) => rank(a) - rank(b)); }
+  return out;
+}
+function renderLeads() {
+  if (S.tab !== 'leads') return;
+  $('#leadChips').innerHTML = LEAD_FILTERS.map(([k, n]) => '<button type="button" class="chip" data-f="' + k + '" aria-pressed="' + (S.leadFilter === k) + '">' + n + '</button>').join('');
+  const m = leadMatches(), show = m.slice(0, 150);
+  renderLeads.list = m;
+  $('#leadCount').textContent = m.length === S.leads.length ? S.leads.length.toLocaleString() + ' leads' : m.length.toLocaleString() + ' of ' + S.leads.length.toLocaleString() + (m.length > show.length ? ' · showing the first ' + show.length : '');
+  $('#leadList').innerHTML = show.length ? show.map(l => leadRow(l)).join('')
+    : '<div class="empty">No lead matches that.' + ($('#leadQ').value.trim() ? '<br><button type="button" class="btn small" id="addFromSearch" style="margin-top:10px">Add “' + esc($('#leadQ').value.trim()) + '” as a new lead</button>' : '') + '</div>';
+  renderLeadDetail();
+}
+function renderLeadDetail() {
+  const el = $('#leadDetail'), l = S.leadByK.get(S.leadSel);
+  if (!l) { if (S.leadSel) el.innerHTML = '<div class="empty">That lead is no longer in the list.</div>'; return; }
+  const same = el.dataset.k === l.k;
+  if (same && typing(el)) return; // don't redraw the card while you're typing in it
+  const g = S.log[l.k] || {touches: [], status: '', note: ''};
+  const phones = String(l.p || '').match(/\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g) || [];
+  const emails = String(l.e || '').match(/[^\s,;]+@[^\s,;]+\.[A-Za-z]{2,}/g) || [];
+  const hist = touches(l).map(x => ({d: x.d, who: x.dir === 'in' ? 'Them' : x.dir === 'bounce' ? 'Bounced' : 'You', text: [x.ch, x.text].filter(Boolean).join(': ')}));
+  const research = (g.research || []).slice().reverse();
+  const sg = stage(l), search = encodeURIComponent(l.c + ' ' + (l.t || '').split(' / ')[0] + ' NY');
+  const o = l.orig || l;
+  withDrafts(el, same, () => {
+    el.dataset.k = l.k;
+    el.innerHTML =
+    '<div class="pad"><h2>' + esc(l.c) + '</h2><div class="sub">' + leadBadge(l) + '<span class="tag ' + STAGE[sg][1] + '">' + STAGE[sg][0] + '</span>' + esc([l.a, l.b].filter(Boolean).join(' · ')) + '</div>' +
+    (l.s === 'removed' ? '<div class="alert bad"><b>Off-limits.</b> ' + esc(l.w || 'Removed from your list.') + '</div>' : '') +
+    (g.status === 'off_limits' ? '<div class="alert bad"><b>You marked this off-limits.</b> Another rep\'s account. Don\'t reach out.</div>' : '') +
+    (l.sf ? '<div class="alert' + (/another rep|other rep|not yours|owned by/i.test(l.sf) ? ' warn' : '') + '"><b>Salesforce, when the list was built:</b> ' + esc(String(l.sf).replace(/^salesforce:\s*/i, '')) + '</div>' : '') +
+    '<dl class="kv">' +
+      (l.ct ? '<dt>Contact</dt><dd>' + esc(l.ct) + '</dd>' : '') +
+      (phones.length ? '<dt>Phone</dt><dd>' + phones.map(p => '<a href="tel:' + esc(p.replace(/\D/g, '')) + '">' + esc(p) + '</a>').join(', ') + '</dd>' : (l.p ? '<dt>Phone</dt><dd>' + esc(l.p) + '</dd>' : '')) +
+      (emails.length ? '<dt>Email</dt><dd>' + emails.map(e => esc(e)).join(', ') + '</dd>' : '') +
+      (l.t ? '<dt>Town</dt><dd>' + esc(l.t) + '</dd>' : '') +
+      (quoteValue(l) ? '<dt>Open quote</dt><dd>' + esc(money(quoteValue(l))) + (g.quoteDate ? ' · sent ' + esc(agoDay(g.quoteDate)) : '') + '</dd>' : '') +
+      (l.d ? '<dt>Detail</dt><dd>' + esc(l.d) + '</dd>' : '') +
+      (l.nx ? '<dt>From the list</dt><dd>' + esc(l.nx) + '</dd>' : '') +
+      (l.n ? '<dt>On file</dt><dd class="pre">' + esc(l.n) + '</dd>' : '') +
+      (l.corrected ? '<dt>Corrected</dt><dd class="sub" style="margin:0">Shown with your corrections. The built-in list had: ' + esc([o.ct, o.p, o.e, o.t].filter(Boolean).join(' · ') || 'nothing') + '</dd>' : '') +
+    '</dl>' +
+    '<div class="btns" style="margin-top:0">' +
+      (phones[0] ? '<button type="button" class="btn small" data-copy="' + esc(phones[0]) + '">Copy phone</button>' : '') +
+      (emails[0] ? '<button type="button" class="btn small" data-copy="' + esc(emails[0]) + '">Copy email</button><a class="btn small" target="_blank" rel="noopener" href="https://outlook.office.com/mail/deeplink/compose?to=' + encodeURIComponent(emails[0]) + '">Draft email in Outlook</a>' : '') +
+      '<a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/search?q=' + search + '">Search the web</a>' +
+      '<button type="button" class="btn small" data-copy="' + esc(location.origin + location.pathname + '#lead/' + encodeURIComponent(l.k)) + '">Copy link to this lead</button>' +
+    '</div>' +
+    '<details id="ld_editbox" style="margin-top:10px"><summary style="cursor:pointer;color:var(--accent)">Correct the contact details</summary>' +
+      '<div class="grid2" style="margin-top:8px">' +
+      '<div><label for="le_ct">Contact person</label><input class="draft" id="le_ct" type="text" value="' + esc(l.ct) + '"></div>' +
+      '<div><label for="le_t">Town</label><input class="draft" id="le_t" type="text" value="' + esc(l.t) + '"></div>' +
+      '<div><label for="le_p">Phone</label><input class="draft" id="le_p" type="tel" value="' + esc(l.p) + '"></div>' +
+      '<div><label for="le_e">Email</label><input class="draft" id="le_e" type="text" value="' + esc(l.e) + '"></div></div>' +
+      '<div class="btns"><button type="button" class="btn primary" id="le_save">Save corrections</button><span class="sub">Only use details you saw on a real source.</span></div></details></div>' +
+
+    '<div class="sec"><h3>Next step</h3>' +
+      '<input class="draft" id="ld_next" type="text" aria-label="Next step" placeholder="e.g. Call Bob for feedback on the Lark St proposal" value="' + esc(g.next || '') + '">' +
+      '<div class="inline" style="margin-top:8px"><label for="ld_date" style="margin:0">Follow up on</label><input class="draft" id="ld_date" type="date" value="' + esc(g.remind || '') + '">' +
+      [['Tomorrow', 1], ['In 3 days', 3], ['Next week', 7], ['In 2 weeks', 14]].map(([n, d]) => '<button type="button" class="btn small" data-plus="' + d + '">' + n + '</button>').join('') + '</div>' +
+      '<div class="btns"><button type="button" class="btn primary" id="ld_nextSave">Save next step</button>' + (g.next || g.remind ? '<button type="button" class="btn" id="ld_nextClear">Done, clear it</button>' : '') +
+      (g.remind ? '<span class="sub">Due ' + esc(prettyDue(g.remind)) + '. Your phone reminds you at 8:30 that morning.</span>' : '') + '</div></div>' +
+
+    '<div class="sec"><h3>Log it</h3><div class="btns" style="margin-top:0">' + ['Call', 'Email', 'Text', 'Visit'].map(c => '<button type="button" class="btn small" data-touch="' + c + '">' + c + '</button>').join('') + '</div>' +
+      '<div class="inline" style="margin-top:10px;align-items:flex-end"><div style="min-width:220px"><label for="ld_status">Status</label><select id="ld_status">' + Object.entries(STATUS).map(([k, n]) => '<option value="' + k + '"' + ((g.status || '') === k ? ' selected' : '') + '>' + n + '</option>').join('') + '</select></div>' +
+      (g.status === 'quote' ? '<div><label for="ld_amount">Quote amount ($)</label><div class="inline"><input class="draft" id="ld_amount" type="number" min="0" step="1" style="width:140px" value="' + esc(g.quoteAmount || '') + '"><button type="button" class="btn small" id="ld_amountSave">Save amount</button></div></div>' : '') + '</div></div>' +
+
+    '<div class="sec"><h3>Research log' + (research.length ? ' (' + research.length + ')' : '') + '</h3>' +
+      '<textarea class="draft" id="ld_research" aria-label="New research entry" placeholder="What you found: Outlook reply, Salesforce owner and quote stage, website, who to ask for. Each entry is dated and added to the log; nothing is overwritten."></textarea>' +
+      '<div class="btns"><button type="button" class="btn primary" id="ld_researchAdd">Add entry</button></div>' +
+      (research.length ? '<ul class="hist" style="margin-top:10px">' + research.map(x => '<li><time>' + esc(x.d) + '</time><span class="pre">' + esc(x.t) + (x.waiting ? ' <span class="tag wait">' + (caps() < 2 ? 'Waiting for app update' : 'Waiting for phone') + '</span>' : '') + '</span></li>').join('') + '</ul>' : '') + '</div>' +
+
+    '<div class="sec"><h3>Your note</h3><textarea class="draft" id="ld_note" aria-label="Your note on this lead">' + esc(g.note || '') + '</textarea><div class="btns"><button type="button" class="btn" id="ld_save">Save note</button><span class="sub">The same note you type on the phone. Saving replaces it.</span></div></div>' +
+    '<div class="sec"><h3>History</h3>' + (hist.length ? '<ul class="hist">' + hist.slice(0, 40).map(h => '<li><time>' + esc(h.d) + '</time><span><b>' + esc(h.who) + '</b> ' + esc(h.text) + '</span></li>').join('') + '</ul>' : '<div class="sub">Nothing logged yet.</div>') + '</div>';
+  });
+}
+
+/* ---------- Pipeline ---------- */
+function renderPipeline() {
+  if (S.tab !== 'pipeline') return;
+  const open = S.leads.filter(l => stage(l) !== 'closed'), st = l => (S.log[l.k] || {}).status || '';
+  const isQuote = l => st(l) === 'quote' || (l.s === 'working' && Number(l.val) > 0);
+  const cols = [
+    ['Wrote back / interested', 'Reply or call these first.', open.filter(l => stage(l) === 'replied' && st(l) !== 'nurture').sort((a, b) => lastActive(b).localeCompare(lastActive(a)))],
+    ['Quote out', 'Call for a decision. No quote emails.', open.filter(isQuote).sort((a, b) => quoteValue(b) - quoteValue(a))],
+    ['In progress', 'Your accounts and working deals.', open.filter(l => stage(l) === 'working' && !isQuote(l)).sort((a, b) => lastActive(b).localeCompare(lastActive(a)))],
+    ['Later', 'Parked. Check in when the date comes up.', open.filter(l => st(l) === 'nurture').sort((a, b) => ((S.log[a.k] || {}).remind || '9').localeCompare((S.log[b.k] || {}).remind || '9'))]
+  ];
+  $('#board').innerHTML = cols.map(([title, note, list], i) => {
+    const total = i === 1 ? list.reduce((n, l) => n + quoteValue(l), 0) : 0;
+    return '<div class="card col"><h3>' + title + '<span>' + list.length + (total ? ' · ' + money(total) : '') + '</span></h3><div class="cardnote">' + note + '</div><div class="list">' +
+      (list.length ? list.slice(0, 60).map(l => leadRow(l, esc([i === 1 && quoteValue(l) ? money(quoteValue(l)) : '', (l.t || '').split(' / ')[0], lastActive(l) ? agoDay(lastActive(l)) : ''].filter(Boolean).join(' · ')))).join('') : '<div class="empty">Nobody here.</div>') + '</div></div>';
+  }).join('');
+}
+
+/* ---------- Job sites ---------- */
+const SITE_FILTERS = [['best', 'Best bets'], ['todo', 'To visit'], ['new', 'New this week'], ['back', 'Go back'], ['visited', 'Visited'], ['mine', 'You added'], ['all', 'All']];
+const ORDER = {hot: 0, likely: 1, maybe: 2, low: 3};
+function isGoBack(s) {
+  const v = S.visits[s.id]; if (!v || isDead(v)) return false;
+  const r = appDate(v.recheck);
+  return (r && r <= new Date()) || v.outcome === 'Follow up' || (EARLY.includes(v.stage) && (!v.windows || v.windows === 'Not in yet'));
+}
 function siteMatches() {
-  const words = $('#siteQ').value.trim().toLowerCase().split(/\s+/).filter(Boolean), f = S.siteFilter;
+  const words = $('#siteQ').value.trim().toLowerCase().split(/\s+/).filter(Boolean), f = S.siteFilter, town = $('#siteTown').value;
   return S.sites.filter(s => {
-    const st = siteState(s);
+    const st = siteState(s), v = S.visits[s.id];
+    if (town && s.town !== town) return false;
+    if (f === 'best' && !(!v && ['hot', 'likely'].includes(rate(s)[0]))) return false;
     if (f === 'todo' && !['todo', 'new', 'pending'].includes(st)) return false;
     if (f === 'new' && st !== 'new') return false;
-    if (f === 'visited' && !['dead', 'nosigns', 'live'].includes(st)) return false;
+    if (f === 'visited' && !v) return false;
+    if (f === 'back' && !isGoBack(s)) return false;
     if (f === 'mine' && !s.mine) return false;
     if (!words.length) return true;
-    const h = (s.addr + ' ' + s.town + ' ' + s.builder + ' ' + s.owner + ' ' + s.type).toLowerCase();
+    const h = (s.addr + ' ' + s.town + ' ' + s.builder + ' ' + s.owner + ' ' + s.type + ' ' + ((v && v.gc) || '')).toLowerCase();
     return words.every(w => h.includes(w));
   });
 }
 let map, layer, fitted = false;
 function renderMap(list) {
-  if (!window.L || $('#tab-sites').classList.contains('hide')) return;
+  if (!window.L || S.tab !== 'sites') return;
   if (!map) {
     map = L.map('map', {preferCanvas: true}).setView([40.88, -72.6], 9);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'}).addTo(map);
@@ -535,58 +872,111 @@ function renderMap(list) {
   layer.clearLayers();
   for (const s of list) {
     if (!(s.lat && s.lon)) continue;
-    const sel = s.id === S.siteSel;
-    L.circleMarker([s.lat, s.lon], {radius: sel ? 9 : 5.5, weight: sel ? 3 : 1, color: sel ? '#111' : '#fff', fillColor: STATE[siteState(s)][2], fillOpacity: .95})
-      .bindTooltip(s.addr.split(',')[0]).on('click', () => pickSite(s.id, false)).addTo(layer);
+    const sel = s.id === S.siteSel, st = siteState(s), hot = !S.visits[s.id] && ['hot', 'likely'].includes(rate(s)[0]) && st !== 'pending';
+    L.circleMarker([s.lat, s.lon], {radius: sel ? 9 : hot ? 6.5 : 5.5, weight: sel ? 3 : 1, color: sel ? '#111' : '#fff', fillColor: hot ? '#d2451e' : STATE[st][2], fillOpacity: .95})
+      .bindTooltip(s.addr.split(',')[0] + (s.builder ? ' · ' + s.builder : '')).on('click', () => pickSite(s.id, false)).addTo(layer);
   }
   map.invalidateSize();
+  if (!fitted) { const pts = list.filter(s => s.lat && s.lon).map(s => [s.lat, s.lon]); if (pts.length) { fitted = true; map.fitBounds(pts, {padding: [20, 20], maxZoom: 14}); } }
 }
 function renderSites() {
+  if (S.tab !== 'sites') return;
   $('#siteChips').innerHTML = SITE_FILTERS.map(([k, n]) => '<button type="button" class="chip" data-f="' + k + '" aria-pressed="' + (S.siteFilter === k) + '">' + n + '</button>').join('');
-  const m = siteMatches().sort((a, b) => String(b.firstSeen || b.date || '').localeCompare(String(a.firstSeen || a.date || '')));
-  const show = m.slice(0, 200), placed = m.filter(s => s.lat && s.lon).length;
+  const sel = $('#siteTown'), towns = [...new Set(S.sites.map(s => s.town).filter(Boolean))].sort();
+  if (sel.options.length !== towns.length + 1) { const cur = sel.value; sel.innerHTML = '<option value="">All towns</option>' + towns.map(t => '<option>' + esc(t) + '</option>').join(''); sel.value = cur; }
+  const byVisit = ['visited', 'back'].includes(S.siteFilter);
+  const m = siteMatches().sort((a, b) => byVisit ? ((S.visits[b.id] || {}).date || 0) - ((S.visits[a.id] || {}).date || 0) : (ORDER[rate(a)[0]] - ORDER[rate(b)[0]]) || String(b.firstSeen || b.date || '').localeCompare(String(a.firstSeen || a.date || '')));
+  renderSites.list = m;
+  const show = m.slice(0, 250), placed = m.filter(s => s.lat && s.lon).length;
   $('#siteCount').textContent = m.length.toLocaleString() + ' job sites' + (placed < m.length ? ' · ' + (m.length - placed) + ' not on the map yet' : '') + (m.length > show.length ? ' · listing the first ' + show.length : '');
-  $('#siteList').innerHTML = show.length ? show.map(s => { const st = STATE[siteState(s)];
-    return '<button type="button" class="row" data-id="' + esc(s.id) + '" aria-current="' + (S.siteSel === s.id) + '"><b>' + esc(s.addr.split(',').slice(0, 2).join(',')) + '</b><span><span class="tag ' + st[1] + '">' + st[0] + '</span>' + esc(s.builder || s.type || '') + '</span></button>'; }).join('')
-    : '<div class="empty">No job site matches that.</div>';
+  $('#siteList').innerHTML = show.length ? show.map(s => siteRow(s)).join('') : '<div class="empty">No job site matches that.</div>';
   renderMap(m); renderSiteDetail();
 }
 function pickSite(id, pan = true) {
-  S.siteSel = id; renderSites();
+  S.siteSel = id; setHash('site/' + encodeURIComponent(id)); renderSites();
   const s = S.siteById.get(id);
   if (pan && map && s && s.lat && s.lon) map.setView([s.lat, s.lon], Math.max(map.getZoom(), 14));
   if (window.innerWidth < 861) $('#siteDetail').scrollIntoView({behavior: 'smooth', block: 'start'});
 }
+// Photos live in the private repository under photos/<site id>/. They are listed when you open a site; big ones load when you ask.
+const photoCache = new Map();
+async function loadPhotoList(id) {
+  if (photoCache.has(id)) return;
+  const e = {list: null, urls: {}, loading: false}; photoCache.set(id, e);
+  try {
+    const r = await gh('/contents/photos/' + encodeURIComponent(id));
+    e.list = r.ok ? (await r.json()).filter(x => x.type === 'file' && /\.(jpe?g|png)$/i.test(x.name)).map(x => ({name: x.name, path: x.path, size: x.size})) : [];
+  } catch { photoCache.delete(id); return; }
+  if (S.siteSel === id) { fillPhotos(id); if (e.list.length && e.list.reduce((n, p) => n + p.size, 0) < 6e6) loadPhotos(id); }
+}
+async function loadPhotos(id) {
+  const e = photoCache.get(id); if (!e || !e.list || e.loading) return;
+  e.loading = true; fillPhotos(id);
+  for (const p of e.list) {
+    if (e.urls[p.name]) continue;
+    try { const r = await gh('/contents/' + p.path.split('/').map(encodeURIComponent).join('/'), {raw: true}); if (r.ok) e.urls[p.name] = URL.createObjectURL(new Blob([await r.blob()], {type: 'image/jpeg'})); } catch {}
+    if (S.siteSel === id) fillPhotos(id);
+  }
+  e.loading = false; if (S.siteSel === id) fillPhotos(id);
+}
+function fillPhotos(id) {
+  const box = $('#sd_photos'); if (!box) return;
+  const e = photoCache.get(id);
+  if (!e || !e.list) { box.innerHTML = '<div class="sub">Checking for photos…</div>'; return; }
+  if (!e.list.length) { box.innerHTML = '<div class="sub">No photos synced for this site.</div>'; return; }
+  const mb = Math.max(1, Math.round(e.list.reduce((n, p) => n + p.size, 0) / 1e6)), got = Object.keys(e.urls).length;
+  box.innerHTML = '<div class="photos">' + e.list.map(p => e.urls[p.name] ? '<img src="' + e.urls[p.name] + '" alt="Photo taken ' + esc(p.name.slice(0, 10)) + '" data-full="1">' : '<div class="ph">' + (e.loading ? 'Loading…' : esc(p.name.slice(0, 10))) + '</div>').join('') + '</div>' +
+    (got < e.list.length && !e.loading ? '<div class="btns"><button type="button" class="btn small" id="sd_loadPhotos">Show ' + e.list.length + (e.list.length === 1 ? ' photo' : ' photos') + ' (' + mb + ' MB)</button></div>' : '');
+}
 function renderSiteDetail() {
   const el = $('#siteDetail'), s = S.siteById.get(S.siteSel);
   if (!s) return;
-  if (el.dataset.id === s.id && el.contains(document.activeElement) && ['TEXTAREA', 'INPUT', 'SELECT'].includes(document.activeElement.tagName)) return;
-  const v = S.visits[s.id], st = STATE[siteState(s)], d = visitDate(v), note = S.notes[s.id] || '';
+  const same = el.dataset.id === s.id;
+  if (same && typing(el)) return;
+  const v = S.visits[s.id], st = STATE[siteState(s)], d = visitDate(v), note = S.notes[s.id] || '', r = rate(s);
   const opt = (list, cur) => list.map(o => '<option' + (o === cur ? ' selected' : '') + ' value="' + esc(o) + '">' + (o || '—') + '</option>').join('');
   const vv = v || {stage: '', outcome: '', windows: 'Not in yet', gc: '', contact: '', notes: ''};
-  el.dataset.id = s.id;
-  el.innerHTML =
-    '<div class="pad"><h2>' + esc(s.addr) + '</h2><div class="sub"><span class="tag ' + st[1] + '">' + st[0] + '</span>' + esc(s.town || '') + '</div>' +
+  const earlier = ((S.backup.visit_history || {})[s.id] || []).slice().reverse();
+  const recheck = v && appDate(v.recheck);
+  const longDate = x => x.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'});
+  withDrafts(el, same, () => {
+    el.dataset.id = s.id;
+    el.innerHTML =
+    '<div class="pad"><h2>' + esc(s.addr) + '</h2><div class="sub"><span class="tag ' + st[1] + '">' + st[0] + '</span><span class="tag ' + RATE[r[0]][1] + '">' + RATE[r[0]][0] + '</span>' + esc(r[1]) + '</div>' +
     '<dl class="kv">' +
+      (s.town ? '<dt>Town</dt><dd>' + esc(s.town) + '</dd>' : '') +
       (s.type ? '<dt>Permit</dt><dd>' + esc(s.type) + '</dd>' : '') +
       (s.date ? '<dt>Date</dt><dd>' + esc(s.date) + (s.firstSeen ? ' · found ' + esc(s.firstSeen) : '') + '</dd>' : '') +
-      (s.builder ? '<dt>Builder</dt><dd>' + esc(s.builder) + ' <button type="button" class="btn small" data-findlead="' + esc(s.builder) + '">Find in leads</button></dd>' : '') +
+      '<dt>Builder</dt><dd>' + (s.builder ? esc(s.builder) + ' <button type="button" class="btn small" data-findlead="' + esc(s.builder) + '">Find in leads</button>' : '<span class="sub">Not known yet</span>') + (s.edited && s.permitBuilder && s.permitBuilder !== s.builder ? '<div class="sub">The permit said: ' + esc(s.permitBuilder) + '</div>' : '') + '</dd>' +
       (s.owner ? '<dt>Owner</dt><dd>' + esc(s.owner) + '</dd>' : '') +
       (!(s.lat && s.lon) ? '<dt>Map</dt><dd>Not placed yet. The phone looks the address up the next time the app is open.</dd>' : '') +
     '</dl>' +
     '<div class="btns" style="margin-top:0"><a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(s.addr) + '">Open in Google Maps</a>' +
-    '<a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/search?q=' + encodeURIComponent(s.addr) + '">Search the address</a></div></div>' +
-    '<div class="sec"><h3>Research note</h3><textarea id="sd_note" aria-label="Research note for this job site" placeholder="What you found online: builder, architect, owner, listing, who to ask for…">' + esc(note) + '</textarea>' +
-      '<div class="btns"><button type="button" class="btn primary" id="sd_saveNote">Save note</button></div><div class="sub" style="margin-top:6px">Shows on this site\'s card in the app under “Research notes”.</div></div>' +
-    '<div class="sec"><h3>' + (v ? 'Your visit' + (d ? ' · ' + d.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}) : '') + (v.waiting ? ' · waiting for phone' : '') : 'No visit logged') + '</h3>' +
-      '<details' + (v ? ' open' : '') + '><summary style="cursor:pointer;color:var(--accent);margin-bottom:8px">' + (v ? 'Edit visit' : 'Log a visit from here (dated today)') + '</summary>' +
+    '<a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/search?q=' + encodeURIComponent(s.addr) + '">Search the address</a>' +
+    '<button type="button" class="btn small" data-copy="' + esc(location.origin + location.pathname + '#site/' + encodeURIComponent(s.id)) + '">Copy link to this site</button></div>' +
+    '<details id="sd_editbox" style="margin-top:10px"><summary style="cursor:pointer;color:var(--accent)">Set or correct the builder and owner</summary>' +
+      '<div class="grid2" style="margin-top:8px"><div><label for="se_builder">Builder</label><input class="draft" id="se_builder" type="text" value="' + esc(s.builder) + '"></div>' +
+      '<div><label for="se_owner">Owner</label><input class="draft" id="se_owner" type="text" value="' + esc(s.owner) + '"></div></div>' +
+      '<div class="btns"><button type="button" class="btn primary" id="se_save">Save</button><span class="sub">Shows on the pin and the site card in the app. A named builder also raises the rating of an addition.</span></div></details></div>' +
+    '<div class="sec"><h3>Research note</h3><textarea class="draft" id="sd_note" aria-label="Research note for this job site" placeholder="What you found online: builder, architect, owner, listing, who to ask for…">' + esc(note) + '</textarea>' +
+      '<div class="btns"><button type="button" class="btn primary" id="sd_saveNote">Save note</button><span class="sub">Shows on this site\'s card in the app under “Research notes”.</span></div></div>' +
+    (v || s.mine ? '<div class="sec"><h3>Photos</h3><div id="sd_photos"></div></div>' : '') +
+    '<div class="sec"><h3>' + (v ? 'Your visit' + (d ? ' · ' + longDate(d) : '') + (v.waiting ? ' · waiting for phone' : '') : 'No visit logged') + '</h3>' +
+      (v ? '<dl class="kv" style="margin-top:0">' + (v.stage ? '<dt>Stage</dt><dd>' + esc(v.stage) + '</dd>' : '') + (v.outcome ? '<dt>Outcome</dt><dd>' + esc(v.outcome) + '</dd>' : '') + '<dt>Windows</dt><dd>' + esc(v.windows || 'Not in yet') + '</dd>' +
+        (v.gc ? '<dt>Builder on site</dt><dd>' + esc(v.gc) + ' <button type="button" class="btn small" data-findlead="' + esc(v.gc) + '">Find in leads</button></dd>' : '') + (v.contact ? '<dt>Contact</dt><dd>' + esc(v.contact) + '</dd>' : '') +
+        (recheck ? '<dt>Check back</dt><dd>' + esc(longDate(recheck)) + '</dd>' : '') +
+        (v.notes ? '<dt>Notes</dt><dd class="pre">' + esc(v.notes) + '</dd>' : '') + '</dl>' : '') +
+      '<details id="sd_visitbox"><summary style="cursor:pointer;color:var(--accent);margin-bottom:8px">' + (v ? 'Edit this visit' : 'Log a visit from here (dated today)') + '</summary>' +
       '<div class="grid2"><div><label for="sv_stage">Stage</label><select id="sv_stage">' + opt(STAGES, vv.stage) + '</select></div>' +
       '<div><label for="sv_outcome">Outcome</label><select id="sv_outcome">' + opt(OUTCOMES, vv.outcome) + '</select></div>' +
       '<div><label for="sv_windows">Windows</label><select id="sv_windows">' + opt(WINDOWS.includes(vv.windows) ? WINDOWS : [...WINDOWS, vv.windows], vv.windows) + '</select></div>' +
-      '<div><label for="sv_gc">Builder on site</label><input id="sv_gc" type="text" value="' + esc(vv.gc) + '"></div></div>' +
-      '<div style="margin-top:10px"><label for="sv_contact">Contact</label><input id="sv_contact" type="text" value="' + esc(vv.contact) + '"></div>' +
-      '<div style="margin-top:10px"><label for="sv_notes">Visit notes</label><textarea id="sv_notes" style="min-height:120px">' + esc(vv.notes) + '</textarea></div>' +
-      '<div class="btns"><button type="button" class="btn primary" id="sv_save">Save visit</button></div></details></div>';
+      '<div><label for="sv_gc">Builder on site</label><input class="draft" id="sv_gc" type="text" value="' + esc(vv.gc) + '"></div></div>' +
+      '<div style="margin-top:10px"><label for="sv_contact">Contact</label><input class="draft" id="sv_contact" type="text" value="' + esc(vv.contact) + '"></div>' +
+      '<div style="margin-top:10px"><label for="sv_notes">Visit notes</label><textarea class="draft" id="sv_notes" style="min-height:120px">' + esc(vv.notes) + '</textarea></div>' +
+      '<div class="btns"><button type="button" class="btn primary" id="sv_save">Save visit</button></div></details>' +
+      (earlier.length ? '<h3 style="margin-top:14px">Earlier visits</h3><ul class="hist">' + earlier.map(x => '<li><time>' + esc(ymd(appDate(x.date) || new Date())) + '</time><span>' + esc([x.stage, x.outcome, x.gc].filter(Boolean).join(' · ')) + (x.notes ? '<div class="sub pre">' + esc(x.notes) + '</div>' : '') + '</span></li>').join('') + '</ul>' : '') + '</div>';
+  });
+  if (v || s.mine) { fillPhotos(s.id); loadPhotoList(s.id); }
 }
 
 /* ---------- Add ---------- */
@@ -594,10 +984,10 @@ function leadDupes(name, extra) {
   const n = coName(name), digits = String(extra && extra.phone || '').replace(/\D/g, ''), em = String(extra && extra.email || '').toLowerCase().trim();
   if (n.length < 3 && digits.length < 7 && !em) return [];
   const out = [];
+  // Same name once the filler words are dropped, or one name sitting whole inside the other when it is long enough to mean something.
+  const inside = (a, b) => a.length >= 8 && (' ' + b + ' ').includes(' ' + a + ' ');
   for (const l of S.leads) {
     const c = l._c || (l._c = coName(l.c));
-    // Same name once the filler words are dropped, or one name sitting whole inside the other when it is long enough to mean something.
-    const inside = (a, b) => a.length >= 8 && (' ' + b + ' ').includes(' ' + a + ' ');
     const hit = (n.length >= 3 && c && (c === n || inside(n, c) || inside(c, n))) || (digits.length >= 10 && l._h.includes(digits.slice(-10))) || (em.length > 5 && l._h.includes(em));
     if (hit) { out.push(l); if (out.length >= 6) break; }
   }
@@ -616,6 +1006,7 @@ function addLead(f) {
   const company = (f.company || '').trim(); if (!company) return null;
   const k = 'web-' + norm(company).replace(/ /g, '-').slice(0, 40) + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
   send({type: 'lead.add', k, company, contact: (f.contact || '').trim(), phone: (f.phone || '').trim(), email: (f.email || '').trim(), town: (f.town || '').trim(), note: (f.note || '').trim(), source: (f.source || '').trim()}, 'New lead: ' + company);
+  if ((f.next || '').trim() || f.date) send({type: 'lead.next', k, text: (f.next || '').trim(), date: f.date || ''}, 'Next step for ' + company);
   return k;
 }
 function parseBulk() {
@@ -630,82 +1021,147 @@ function checkBulk() {
   const fresh = bulkRows.filter(r => !r.dupes.length).length;
   $('#bulkPreview').innerHTML = bulkRows.length ? '<table><thead><tr><th>Company</th><th>Contact</th><th>Phone</th><th>Email</th><th>Town</th><th>Check</th></tr></thead><tbody>' + bulkRows.map(r =>
     '<tr><td>' + esc(r.company) + '</td><td>' + esc(r.contact) + '</td><td>' + esc(r.phone) + '</td><td>' + esc(r.email) + '</td><td>' + esc(r.town) + '</td><td>' +
-    (r.dupes.length ? '<span class="tag ' + (r.dupes.some(d => d.s === 'removed') ? 'bad">Off-limits match' : 'warn">Already listed') + '</span> ' + esc(r.dupes[0].c) : '<span class="tag good">New</span>') + '</td></tr>').join('') + '</tbody></table>'
+    (r.dupes.length ? '<span class="tag ' + (r.dupes.some(offLimits) ? 'bad">Off-limits match' : 'warn">Already listed') + '</span> ' + esc(r.dupes[0].c) : '<span class="tag good">New</span>') + '</td></tr>').join('') + '</tbody></table>'
     : '<div class="sub">Nothing to read yet. Paste one lead per line.</div>';
   const b = $('#bulkAdd'); b.classList.toggle('hide', !fresh); b.textContent = 'Add the ' + fresh + ' new ' + (fresh === 1 ? 'lead' : 'leads') + (fresh < bulkRows.length ? ' (skip ' + (bulkRows.length - fresh) + ' already listed)' : '');
 }
 
 /* ---------- Activity ---------- */
 function renderActivity() {
-  const applied = new Set(S.backup.applied_ops || []), queued = new Set(S.queue.map(o => o.id)), inbox = new Set((S.inbox.ops || []).map(o => o.id));
-  const waiting = pendingOps().length;
-  $('#actSub').textContent = waiting ? waiting + ' waiting for your phone. They land as soon as Field Hub is open on the iPhone.' : 'Everything you sent has reached your phone.';
-  $('#actList').innerHTML = S.sent.length ? '<table><thead><tr><th>When</th><th>What</th><th>Status</th></tr></thead><tbody>' + S.sent.map(a => {
-    const st = applied.has(a.id) ? '<span class="tag good">On phone ✓</span>' : queued.has(a.id) ? '<span class="tag warn">Not sent yet</span>' : inbox.has(a.id) ? '<span class="tag wait">Waiting for phone</span>' : '<span class="tag good">On phone ✓</span>';
+  if (S.tab !== 'activity') return;
+  const applied = new Set(S.backup.applied_ops || []), queued = new Map(S.queue.map(o => [o.id, o])), inbox = new Set((S.inbox.ops || []).map(o => o.id));
+  const pend = pendingOps(), held = pend.filter(o => needs(o) > caps()).length, waiting = pend.length - held;
+  $('#actSub').textContent = (waiting ? waiting + ' waiting for your phone. They land as soon as Field Hub is open on the iPhone. ' : '') + (held ? held + ' waiting for the app update (build 50). ' : '') + (!waiting && !held ? 'Everything you sent has reached your phone.' : '');
+  $('#actList').innerHTML = S.sent.length ? '<table><thead><tr><th>When</th><th>What</th><th>Status</th></tr></thead><tbody>' + S.sent.slice(0, 120).map(a => {
+    const q = queued.get(a.id);
+    const st = applied.has(a.id) ? '<span class="tag good">On phone ✓</span>' : q ? (needs(q) > caps() ? '<span class="tag wait">Waiting for app update</span>' : '<span class="tag warn">Not sent yet</span>') : inbox.has(a.id) ? '<span class="tag wait">Waiting for phone</span>' : '<span class="tag good">On phone ✓</span>';
     return '<tr><td style="white-space:nowrap">' + esc(new Date(a.t).toLocaleString(undefined, {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'})) + '</td><td>' + esc(a.label) + '</td><td>' + st + '</td></tr>'; }).join('') + '</tbody></table>'
     : '<div class="empty">Nothing sent from this browser yet.</div>';
   const saved = S.backup.saved_at ? new Date(S.backup.saved_at).toLocaleString() : 'not reported yet';
-  $('#phoneInfo').textContent = 'Phone last checked in: ' + saved + '. Daily permit search last updated: ' + (S.feedUpdated || 'unknown') + '. ' + Object.keys(S.backup.visits || {}).length + ' visits, ' + S.sites.length.toLocaleString() + ' job sites, ' + S.leads.length.toLocaleString() + ' leads.';
+  $('#phoneInfo').textContent = 'Phone last checked in: ' + saved + (S.backup.app_build ? ' (app build ' + S.backup.app_build + ')' : '') + '. The daily permit search last added sites on ' + (S.feedUpdated || 'an unknown date') + '. ' + Object.keys(S.backup.visits || {}).length + ' visits, ' + S.sites.length.toLocaleString() + ' job sites, ' + S.leads.length.toLocaleString() + ' leads.';
 }
-function renderAll() { renderSync(); renderLeads(); renderSites(); renderActivity(); }
+function renderAll() { renderSync(); renderToday(); renderLeads(); renderPipeline(); renderSites(); renderActivity(); }
 
 /* ---------- Tabs, links, events ---------- */
-function showTab(t) {
+const TABS = ['today', 'leads', 'pipeline', 'sites', 'add', 'activity'];
+function setHash(h) { try { history.replaceState(null, '', '#' + h); } catch {} }
+function showTab(t, keepHash) {
+  S.tab = t;
   for (const b of document.querySelectorAll('nav button')) b.setAttribute('aria-selected', b.dataset.tab === t);
-  for (const n of ['leads', 'sites', 'add', 'activity']) $('#tab-' + n).classList.toggle('hide', n !== t);
-  if (t === 'sites') { renderSites(); if (map && !fitted) { fitted = true; const pts = S.sites.filter(s => s.lat && s.lon).map(s => [s.lat, s.lon]); if (pts.length) map.fitBounds(pts, {padding: [20, 20]}); } }
+  for (const n of TABS) $('#tab-' + n).classList.toggle('hide', n !== t);
+  if (!keepHash) setHash(t);
+  renderAll();
 }
-function openLead(k) { S.leadSel = k; showTab('leads'); renderLeads(); if (window.innerWidth < 861) $('#leadDetail').scrollIntoView({behavior: 'smooth', block: 'start'}); }
+function openLead(k) { S.leadSel = k; showTab('leads', true); setHash('lead/' + encodeURIComponent(k)); if (window.innerWidth < 861) $('#leadDetail').scrollIntoView({behavior: 'smooth', block: 'start'}); }
+function openSite(id, filter) { if (filter) S.siteFilter = filter; showTab('sites', true); const s = S.siteById.get(id); if (s && !siteMatches().includes(s)) { S.siteFilter = 'all'; $('#siteQ').value = ''; $('#siteTown').value = ''; } pickSite(id); }
+function go(where) {
+  if (where.startsWith('sites:')) { S.siteFilter = where.slice(6); $('#siteQ').value = ''; $('#siteTown').value = ''; fitted = false; return showTab('sites'); }
+  if (where === 'pipeline') return showTab('pipeline');
+  if (where === 'visited') { S.siteFilter = 'visited'; fitted = false; return showTab('sites'); }
+  S.leadFilter = where; $('#leadQ').value = ''; showTab('leads');
+}
 function applyHash() {
-  // hub.html#add?company=…&contact=…&phone=…&email=…&town=…&note=…&source=…   hub.html#site?addr=…&town=…&builder=…&note=…   hub.html#q=…
-  const h = decodeURIComponent(location.hash.slice(1)); if (!h) return;
-  const [name, qs] = h.includes('?') ? h.split(/\?(.*)/s) : [h, ''];
-  const p = new URLSearchParams(location.hash.includes('?') ? location.hash.slice(location.hash.indexOf('?') + 1) : '');
-  if (name === 'add') { showTab('add'); for (const f of ['company', 'contact', 'phone', 'email', 'town', 'note', 'source']) if (p.get(f)) $('#al_' + f).value = p.get(f); showLeadDupes(); }
-  else if (name === 'site') { showTab('add'); for (const f of ['addr', 'town', 'builder', 'note']) if (p.get(f)) $('#as_' + f).value = p.get(f); showSiteDupes(); $('#addSite').scrollIntoView(); }
-  else if (name.startsWith('q=')) { $('#leadQ').value = name.slice(2); renderLeads(); }
-  else if (['leads', 'sites', 'add', 'activity'].includes(name)) showTab(name);
+  // #lead/<key>  #site/<id>  #add?company=…&contact=…&phone=…&email=…&town=…&note=…&source=…&next=…&date=…  #site?addr=…&town=…&builder=…&note=…  #q=…  #<tab>
+  const h = location.hash.slice(1); if (!h) return;
+  const qi = h.indexOf('?');
+  let name; try { name = decodeURIComponent(qi < 0 ? h : h.slice(0, qi)); } catch { name = h; }
+  const p = new URLSearchParams(qi < 0 ? '' : h.slice(qi + 1));
+  if (name.startsWith('lead/')) { const k = name.slice(5); if (S.leadByK.has(k)) openLead(k); }
+  else if (name.startsWith('site/')) { const id = name.slice(5); if (S.siteById.has(id)) openSite(id); }
+  else if (name === 'add') { showTab('add', true); for (const f of ['company', 'contact', 'phone', 'email', 'town', 'note', 'source', 'next', 'date']) if (p.get(f)) $('#al_' + f).value = p.get(f); showLeadDupes(); }
+  else if (name === 'site') { showTab('add', true); for (const f of ['addr', 'town', 'builder', 'note']) if (p.get(f)) $('#as_' + f).value = p.get(f); showSiteDupes(); $('#addSite').scrollIntoView(); }
+  else if (name.startsWith('q=')) { $('#leadQ').value = name.slice(2); S.leadFilter = 'all'; showTab('leads', true); }
+  else if (TABS.includes(name)) showTab(name, true);
 }
+async function copy(text) { try { await navigator.clipboard.writeText(text); toast('Copied'); } catch { toast(text); } }
+
 document.querySelector('nav').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) showTab(b.dataset.tab); });
+$('#syncBtn').addEventListener('click', async () => { await pollBackup(true); flush(); toast('Refreshed'); });
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-copy]'); if (c) return copy(c.dataset.copy);
+  if (e.target.dataset && e.target.dataset.full) { const lb = $('#lightbox'); lb.querySelector('img').src = e.target.src; lb.classList.remove('hide'); }
+});
+$('#lightbox').addEventListener('click', () => $('#lightbox').classList.add('hide'));
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') $('#lightbox').classList.add('hide');
+  if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) { if (S.tab !== 'sites' && S.tab !== 'leads') showTab('leads'); e.preventDefault(); (S.tab === 'sites' ? $('#siteQ') : $('#leadQ')).focus(); }
+});
+for (const id of ['stats', 'dash', 'board']) $('#' + id).addEventListener('click', e => {
+  const a = e.target.closest('[data-addgc]');
+  if (a) { const s = S.siteById.get(a.dataset.addgc), v = S.visits[s.id] || {}; showTab('add'); $('#al_company').value = v.gc || ''; $('#al_contact').value = v.contact || ''; $('#al_town').value = s.town || ''; $('#al_note').value = 'Met on site at ' + s.addr + (v.notes ? '\n' + v.notes : ''); showLeadDupes(); $('#al_phone').focus(); return; }
+  const g = e.target.closest('[data-go]'); if (g) return go(g.dataset.go);
+  const r = e.target.closest('.row[data-k]'); if (r) return openLead(r.dataset.k);
+  const s = e.target.closest('.row[data-id]'); if (s) return openSite(s.dataset.id);
+});
 $('#leadQ').addEventListener('input', renderLeads);
+$('#leadSort').addEventListener('change', renderLeads);
 $('#siteQ').addEventListener('input', renderSites);
+$('#siteTown').addEventListener('change', () => { fitted = false; renderSites(); });
 $('#leadChips').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { S.leadFilter = b.dataset.f; renderLeads(); } });
-$('#siteChips').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { S.siteFilter = b.dataset.f; renderSites(); } });
+$('#siteChips').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { S.siteFilter = b.dataset.f; fitted = false; renderSites(); } });
+$('#leadCsv').addEventListener('click', () => download('field-hub-leads-' + today() + '.csv', csv(leadCsvRows((renderLeads.list || []).slice(0, 5000)))));
+$('#siteCsv').addEventListener('click', () => download('field-hub-job-sites-' + today() + '.csv', csv(siteCsvRows(renderSites.list || []))));
+$('#csvVisits').addEventListener('click', () => download('field-hub-visits-' + today() + '.csv', csv(siteCsvRows(S.sites.filter(s => S.visits[s.id]).sort((a, b) => S.visits[b.id].date - S.visits[a.id].date)))));
+$('#csvWorked').addEventListener('click', () => download('field-hub-leads-worked-' + today() + '.csv', csv(leadCsvRows(S.leads.filter(l => { const g = S.log[l.k]; return g && ((g.touches || []).length || g.status || g.note || g.next || (g.research || []).length); }).sort((a, b) => lastActive(b).localeCompare(lastActive(a)))))));
 $('#leadList').addEventListener('click', e => {
   const r = e.target.closest('[data-k]'); if (r) return openLead(r.dataset.k);
-  if (e.target.id === 'addFromSearch') { showTab('add'); $('#al_company').value = $('#leadQ').value.trim(); $('#al_contact').focus(); }
+  if (e.target.id === 'addFromSearch') { const q = $('#leadQ').value.trim(); showTab('add'); $('#al_company').value = q; showLeadDupes(); $('#al_contact').focus(); }
 });
 $('#siteList').addEventListener('click', e => { const r = e.target.closest('[data-id]'); if (r) pickSite(r.dataset.id); });
 $('#leadDetail').addEventListener('click', e => {
   const l = S.leadByK.get(S.leadSel); if (!l) return;
+  const done = msg => { if (document.activeElement) document.activeElement.blur(); toast(msg); };
+  const keep = (...ids) => { for (const i of ids) { const x = $(i); if (x) x.defaultValue = x.value; } };
   const t = e.target.closest('[data-touch]');
-  if (t) { document.activeElement.blur(); send({type: 'lead.touch', k: l.k, ch: t.dataset.touch}, t.dataset.touch + ' logged: ' + l.c); toast(t.dataset.touch + ' logged'); }
-  if (e.target.id === 'ld_save') { const text = $('#ld_note').value.trim(); e.target.blur(); send({type: 'lead.note', k: l.k, text}, 'Note on ' + l.c); toast('Note saved'); }
+  if (t) { done(t.dataset.touch + ' logged'); return send({type: 'lead.touch', k: l.k, ch: t.dataset.touch}, t.dataset.touch + ' logged: ' + l.c); }
+  const p = e.target.closest('[data-plus]'); if (p) { $('#ld_date').value = plusDays(Number(p.dataset.plus)); return; }
+  const id = e.target.id;
+  if (id === 'ld_save') { const text = $('#ld_note').value.trim(); keep('#ld_note'); done('Note saved'); send({type: 'lead.note', k: l.k, text}, 'Note on ' + l.c); }
+  if (id === 'ld_researchAdd') { const text = $('#ld_research').value.trim(); if (!text) return toast('Type the entry first'); $('#ld_research').value = ''; done('Added to the research log'); send({type: 'lead.research', k: l.k, text, d: today()}, 'Research on ' + l.c + ': ' + text.split('\n')[0].slice(0, 60)); }
+  if (id === 'ld_nextSave') { const text = $('#ld_next').value.trim(), date = $('#ld_date').value; if (!text && !date) return toast('Type a next step or pick a date'); keep('#ld_next', '#ld_date'); done('Next step saved'); send({type: 'lead.next', k: l.k, text, date}, 'Next for ' + l.c + ': ' + (text || 'follow up') + (date ? ' (' + prettyDue(date) + ')' : '')); }
+  if (id === 'ld_nextClear') { $('#ld_next').value = ''; $('#ld_date').value = ''; keep('#ld_next', '#ld_date'); done('Cleared'); send({type: 'lead.next', k: l.k, text: '', date: ''}, 'Next step done: ' + l.c); }
+  if (id === 'ld_amountSave') { const amount = Number($('#ld_amount').value) || 0; keep('#ld_amount'); done('Amount saved'); send({type: 'lead.status', k: l.k, status: 'quote', amount, v: 2}, 'Quote ' + money(amount) + ': ' + l.c); }
+  if (id === 'le_save') {
+    const o = l.orig || l, fields = {};
+    for (const [f, sel] of [['ct', '#le_ct'], ['t', '#le_t'], ['p', '#le_p'], ['e', '#le_e']]) { const v = $(sel).value.trim(); if (v !== (l[f] || '')) fields[f] = v === (o[f] || '') ? '' : v; }
+    if (!Object.keys(fields).length) return toast('Nothing changed');
+    keep('#le_ct', '#le_t', '#le_p', '#le_e'); $('#ld_editbox').open = false; done('Corrections saved'); send({type: 'lead.update', k: l.k, fields}, 'Contact details corrected: ' + l.c);
+  }
 });
 $('#leadDetail').addEventListener('change', e => {
   const l = S.leadByK.get(S.leadSel);
-  if (l && e.target.id === 'ld_status') { const v = e.target.value; e.target.blur(); send({type: 'lead.status', k: l.k, status: v}, 'Status "' + STATUS[v] + '": ' + l.c); toast('Status saved'); }
+  if (l && e.target.id === 'ld_status') { const v = e.target.value; if (document.activeElement) document.activeElement.blur(); toast('Status saved'); send({type: 'lead.status', k: l.k, status: v, ...(v === 'off_limits' ? {v: 2} : {})}, 'Status "' + STATUS[v] + '": ' + l.c); }
 });
 $('#siteDetail').addEventListener('click', e => {
   const s = S.siteById.get(S.siteSel); if (!s) return;
-  const short = s.addr.split(',')[0];
-  if (e.target.id === 'sd_saveNote') { const text = $('#sd_note').value.trim(); e.target.blur(); send({type: 'site.note', site_id: s.id, text}, 'Research note: ' + short); toast('Note saved'); }
-  if (e.target.id === 'sv_save') {
+  const short = s.addr.split(',')[0], done = msg => { if (document.activeElement) document.activeElement.blur(); toast(msg); };
+  const keepAll = sel => { for (const i of $('#siteDetail').querySelectorAll(sel)) i.defaultValue = i.value; };
+  const id = e.target.id;
+  if (id === 'sd_loadPhotos') return loadPhotos(s.id);
+  if (id === 'sd_saveNote') { const text = $('#sd_note').value.trim(); keepAll('#sd_note'); done('Note saved'); send({type: 'site.note', site_id: s.id, text}, 'Research note: ' + short); }
+  if (id === 'se_save') {
+    const b = $('#se_builder').value.trim(), o = $('#se_owner').value.trim(), op = {type: 'site.update', site_id: s.id};
+    if (b !== (s.builder || '')) op.builder = b;
+    if (o !== (s.owner || '')) op.owner = o;
+    if (!('builder' in op) && !('owner' in op)) return toast('Nothing changed');
+    keepAll('#sd_editbox .draft'); $('#sd_editbox').open = false; done('Saved'); send(op, (op.builder ? 'Builder is ' + op.builder : 'Details corrected') + ': ' + short);
+  }
+  if (id === 'sv_save') {
     const fields = {stage: $('#sv_stage').value, outcome: $('#sv_outcome').value, windows: $('#sv_windows').value, gc: $('#sv_gc').value.trim(), contact: $('#sv_contact').value.trim(), notes: $('#sv_notes').value};
-    e.target.blur(); send({type: 'visit.update', site_id: s.id, fields}, 'Visit updated: ' + short); toast('Visit saved');
+    keepAll('#sd_visitbox .draft'); $('#sd_visitbox').open = false; done('Visit saved'); send({type: 'visit.update', site_id: s.id, fields}, 'Visit updated: ' + short);
   }
   const f = e.target.closest('[data-findlead]');
-  if (f) { showTab('leads'); S.leadFilter = 'all'; $('#leadQ').value = coName(f.dataset.findlead) || f.dataset.findlead; renderLeads(); }
+  if (f) { S.leadFilter = 'all'; $('#leadQ').value = coName(f.dataset.findlead) || f.dataset.findlead; showTab('leads'); }
 });
 for (const id of ['al_company', 'al_phone', 'al_email']) $('#' + id).addEventListener('input', showLeadDupes);
 $('#as_addr').addEventListener('input', showSiteDupes);
 $('#al_match').addEventListener('click', e => { const b = e.target.closest('[data-open]'); if (b) openLead(b.dataset.open); });
-$('#as_match').addEventListener('click', e => { const b = e.target.closest('[data-site]'); if (b) { showTab('sites'); S.siteFilter = 'all'; pickSite(b.dataset.site); } });
+$('#as_match').addEventListener('click', e => { const b = e.target.closest('[data-site]'); if (b) openSite(b.dataset.site, 'all'); });
 $('#addLead').addEventListener('submit', e => {
   e.preventDefault();
   const f = Object.fromEntries(new FormData(e.target));
-  const off = leadDupes(f.company, f).filter(l => l.s === 'removed');
-  if (off.length && !e.target.dataset.sure) { e.target.dataset.sure = '1'; $('#al_match').insertAdjacentHTML('afterbegin', '<div class="alert bad">This looks like <b>' + esc(off[0].c) + '</b>, which is off-limits: ' + esc(off[0].w || 'removed from your list') + '. Press Add lead again to add it anyway.</div>'); return; }
+  const off = leadDupes(f.company, f).filter(offLimits);
+  if (off.length && !e.target.dataset.sure) { e.target.dataset.sure = '1'; $('#al_match').insertAdjacentHTML('afterbegin', '<div class="alert bad">This looks like <b>' + esc(off[0].c) + '</b>, which is off-limits: ' + esc(off[0].w || 'another rep\'s account') + '. Press Add lead again to add it anyway.</div>'); return; }
   delete e.target.dataset.sure;
   const k = addLead(f); if (!k) return;
   e.target.reset(); $('#al_match').innerHTML = ''; toast('Lead added: ' + f.company.trim()); openLead(k);
@@ -714,16 +1170,17 @@ $('#addSite').addEventListener('submit', e => {
   e.preventDefault();
   const f = Object.fromEntries(new FormData(e.target)), addr = f.addr.trim(); if (!addr) return;
   const full = /,/.test(addr) || !f.town.trim() ? addr : addr + ', ' + f.town.trim() + ', NY';
-  if (S.siteById.has(siteKey(full)) || S.sites.some(s => canon(s.addr) === canon(full))) { const s = S.sites.find(s => canon(s.addr) === canon(full)); toast('That address is already on your map'); showTab('sites'); S.siteFilter = 'all'; pickSite(s.id); return; }
+  const dupe = S.sites.find(s => canon(s.addr) === canon(full));
+  if (dupe) { toast('That address is already on your map'); return openSite(dupe.id, 'all'); }
   send({type: 'site.add', addr: full, town: f.town.trim(), kind: f.kind, builder: f.builder.trim(), note: f.note.trim()}, 'New job site: ' + full.split(',')[0]);
-  e.target.reset(); $('#as_match').innerHTML = ''; toast('Job site added'); showTab('sites'); S.siteFilter = 'mine'; pickSite(siteKey(full));
+  e.target.reset(); $('#as_match').innerHTML = ''; toast('Job site added'); openSite(siteKey(full), 'mine');
 });
 $('#bulkCheck').addEventListener('click', checkBulk);
 $('#bulkAdd').addEventListener('click', () => {
   const rows = bulkRows.filter(r => !r.dupes.length); if (!rows.length) return;
   for (const r of rows) addLead(r);
   toast(rows.length + (rows.length === 1 ? ' lead added' : ' leads added')); $('#bulkText').value = ''; $('#bulkPreview').innerHTML = ''; $('#bulkAdd').classList.add('hide'); bulkRows = [];
-  S.leadFilter = 'mine'; showTab('leads'); renderLeads();
+  S.leadFilter = 'mine'; showTab('leads');
 });
 $('#refreshNow').addEventListener('click', async () => { await pollBackup(true); flush(); toast('Refreshed'); });
 $('#disconnect').addEventListener('click', () => { if (confirm('Remove the saved token from this browser? Your data is not touched.')) { store.del('fh.token'); location.reload(); } });
