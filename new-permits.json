@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-18",
+  "updated": "2026-11-23",
   "sites": [
     {
       "lat": 0,
@@ -896,6 +896,20 @@
       "approx": false,
       "navq": "",
       "firstSeen": "2026-11-18"
+    },
+    {
+      "lat": 0,
+      "lon": 0,
+      "addr": "608 West Walnut Street, Long Beach, NY 11561",
+      "town": "Long Beach",
+      "type": "New house, variances for height/yards/parking (Long Beach ZBA)",
+      "builder": "",
+      "owner": "",
+      "date": "2026-11-19",
+      "isNew": true,
+      "approx": false,
+      "navq": "",
+      "firstSeen": "2026-11-23"
     }
   ]
 }
