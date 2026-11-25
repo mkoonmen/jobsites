@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-23",
+  "updated": "2026-11-25",
   "sites": [
     {
       "lat": 0,
@@ -910,6 +910,62 @@
       "approx": false,
       "navq": "",
       "firstSeen": "2026-11-23"
+    },
+    {
+      "lat": 0,
+      "lon": 0,
+      "addr": "32 South 27th Street, Wyandanch, NY",
+      "town": "Wyandanch",
+      "type": "New two-story single-family dwelling on undersized lot (Babylon ZBA)",
+      "builder": "Glenwood Star Property LLC",
+      "owner": "",
+      "date": "2026-12-10",
+      "isNew": true,
+      "approx": false,
+      "navq": "",
+      "firstSeen": "2026-11-25"
+    },
+    {
+      "lat": 0,
+      "lon": 0,
+      "addr": "12 Cornell Drive, Wheatley Heights, NY",
+      "town": "Wheatley Heights",
+      "type": "Second-floor addition with rear balcony (Babylon ZBA)",
+      "builder": "",
+      "owner": "",
+      "date": "2026-12-10",
+      "isNew": false,
+      "approx": false,
+      "navq": "",
+      "firstSeen": "2026-11-25"
+    },
+    {
+      "lat": 0,
+      "lon": 0,
+      "addr": "154 Walker Street, West Babylon, NY",
+      "town": "West Babylon",
+      "type": "One-story rear addition with side entrance (Babylon ZBA)",
+      "builder": "",
+      "owner": "",
+      "date": "2026-12-03",
+      "isNew": false,
+      "approx": false,
+      "navq": "",
+      "firstSeen": "2026-11-25"
+    },
+    {
+      "lat": 0,
+      "lon": 0,
+      "addr": "42nd Street (north side, 272' west of New Highway), Copiague, NY",
+      "town": "Copiague",
+      "type": "2-lot subdivision for two new single-family dwellings (Babylon Planning Board)",
+      "builder": "",
+      "owner": "",
+      "date": "2026-11-16",
+      "isNew": true,
+      "approx": false,
+      "navq": "",
+      "firstSeen": "2026-11-25"
     }
   ]
 }
